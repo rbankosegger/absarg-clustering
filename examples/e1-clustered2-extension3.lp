@@ -1,0 +1,1 @@
+abs_in(d). -abs_in(abce).
