@@ -26,3 +26,10 @@ echo "Closer look at spurious clustered stable extension {a, bce}"
 #echo "bce causes problems and d is falsely excluded. bce is not recognized as problem. No change to the cluster structure!"
 echo "---"
 clingo --verbose=0 tests/refinement-test2.lp tests/refinement-test2-extension.lp semantics/sem-stable.lp semantics/clusem-stable.lp spurious-refinement.lp 0
+echo "---"
+echo "Test 3, output of 'find_spurious.py'":
+python find_spurious.py stable tests/refinement-test2.lp
+echo "Closer look at spurious clustered stable extension {a, a1, bce}"
+#echo "bce causes problems and d, d1 are falsely excluded. bce is not recognized as problem. No change to the cluster structure!"
+echo "---"
+clingo --verbose=0 tests/refinement-test3.lp tests/refinement-test3-extension.lp semantics/sem-stable.lp semantics/clusem-stable.lp spurious-refinement.lp 0

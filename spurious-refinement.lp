@@ -21,23 +21,26 @@
 % 	If no non-spurious answer set exists, then the fixed clustered extension is spurios.
 
 % Remove concrete extensions that do not abstract the given clustered extension
-abs_should_be_out(X') :- abs_in(X'), 0 = #count{ X: in(X), abs_map(X,X')}.
-#show abs_should_be_out/1.
+abs_false_positive(X') :- abs_in(X'), 0 = #count{ X: in(X), abs_map(X,X')}.
+#show abs_false_positive/1.
 
-abs_should_be_in(X') :- in(X), abs_map(X,X'), not abs_in(X').
-#show abs_should_be_in/1.
+abs_false_negative(X') :- in(X), abs_map(X,X'), not abs_in(X').
+#show abs_false_negative/1.
 
-:~ abs_should_be_out(X). [1@1,X]
-:~ abs_should_be_in(X). [1@2,X]
+:~ abs_false_negative(C). [1@2,C]
+:~ abs_false_positive(C). [1@2,C]
 
-abs_refine(X) :- abs_should_be_out(X), not singleton(X).
-abs_refine(X) :- abs_should_be_in(X), not singleton(X).
-% abs_refine(Y) :- abs_should_be_in(X), singleton(X), abs_att(Y,X).
-% abs_refine(Y) :- abs_should_be_out(X), singleton(X), abs_att(Y,X).
-#show abs_refine/1.
+refinement_candidate(C) :- abs_false_positive(C).
+refinement_candidate(C) :- abs_false_negative(C).
+refinement_candidate(C) :- refinement_candidate(A), singleton(A), abs_att(C,A).
 
-% TODO: This does not work e.g. for tests/refinement-test1.lp and tests/refinement-test2.lp
-%abs_refmap(A,C) :- abs_map(A,C), not abs_refine(C).
-%abs_refmap(A, split1(C)) :- abs_refine(C), abs_map(A,C), in(A).
-%abs_refmap(A, split2(C)) :- abs_refine(C), abs_map(A,C), not in(A).
-%#show abs_refmap/2.
+abs_arg_size(C,S) :- abs_arg(C), S = #count{ A : abs_map(A, C) }.
+1 = { abs_split(A, (C, 1..S)) } :- abs_map(A,C), refinement_candidate(C), not singleton(C), abs_arg_size(C,S).
+:- abs_split(A1, C), abs_split(A2, C), in(A1), not in(A2).
+:- abs_split(A1, C), abs_split(A2, C), att(A1, S), not att(A2, S), singleton(S), refinement_candidate(S).
+:~ abs_split(A, (C,N)). [1@1,C,N]
+#show abs_split/2.
+
+abs_map_refined(A,(C,I)) :- abs_split(A,(C,I)).
+abs_map_refined(A,C) :- abs_map(A,C), not abs_split(A,(C,_)).
+
