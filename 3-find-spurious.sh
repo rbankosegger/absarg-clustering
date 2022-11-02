@@ -11,8 +11,8 @@ python find_spurious.py admissible examples/e1.lp examples/e1-map2.lp
 echo ""
 
 echo "Test case 3: Try to map classical extensions to clustered ones. Identify spurious ones."
-python find_spurious.py stable tests/cstable-test3.lp
+python find_spurious.py stable tests/cstable-3.lp tests/cstable-3-map.lp
 echo ""
 
 echo "Test case 4: Try to map classical extensions to clustered ones. Identify spurious ones."
-python find_spurious.py stable tests/cstable-test4.lp
+python find_spurious.py stable tests/cstable-4.lp tests/cstable-4-map.lp
