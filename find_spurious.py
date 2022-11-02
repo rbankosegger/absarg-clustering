@@ -8,13 +8,14 @@ semantics = sys.argv[1]
 clingo_imports = sys.argv[2:]
 if '-h' in sys.argv or len(sys.argv)<=2:
     print('usage: python find_spurious.py cf|admissible|stable instance.lp')
-    print('usage: python find_spurious.py cf|admissible|stable instance-concrete.lp instance-abstract.lp')
+    print('usage: python find_spurious.py cf|admissible|stable instance-concrete.lp instance-abstract-mapping.lp')
     quit()
 
 ctl = Control()
 ctl.configuration.solve.models = 0
 for file in clingo_imports:
     ctl.load(file)
+ctl.load('to-clustered-af.lp')
 ctl.load(f'semantics/clusem-{semantics}.lp')
 ctl.add('base', [], '-abs_in(A) :- abs_arg(A), not abs_in(A).')
 ctl.add('base', [], '#show -abs_in/1.')
@@ -32,6 +33,7 @@ for file in clingo_imports:
     ctl.load(file)
 ctl.load(f'semantics/clusem-{semantics}.lp')
 ctl.load(f'semantics/sem-{semantics}.lp')
+ctl.load('to-clustered-af.lp')
 ctl.load('spurious.lp')
 ctl.add('base', [], ':- spurious.')
 ctl.ground([('base', [])])
