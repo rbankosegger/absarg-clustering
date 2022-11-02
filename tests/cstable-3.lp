@@ -10,33 +10,16 @@
 %	de may be in or out
 %	f, g may be in our out (independently of de, since de is maybe defeated, even if it is in)
 
-% This is the same test as before (cstable-test3.lp), 
-% but with a different concrete stable extension.
-% I.e. it has the same clustered stable extensions, but different ones are spurious!
-
-
-%	The only concrete stable extension is { a, b, c, d, f }
-%	This is abstracted by the clustered stable extension { a, bc, de, f }
+%	The only concrete stable extension is {a, b, c, f, g}
+%	This is abstracted by the clustered stable extension {a, bc, f, g}
 %	The other clustered stable extensions are spurious:
-%		{ a, bc, f, g }
 %		{ a, bc, de }
+%		{ a, bc, de, f}
 %		{ a, bc, de, g}
 %		{ a, bc, de, f, g}
 
 arg(a;b;c;d;e;f;g).
 att(a,e).	
-att(b,e).	% << difference to cstable-test3.lp, where att(b,d).
+att(b,d).
 att(e,f).
 att(d,g).
-
-abs_map(a,a).	
-abs_map(b,bc).	
-abs_map(c,bc).
-abs_map(d,de).
-abs_map(e,de).
-abs_map(f,f).
-abs_map(g,g).
-
-abs_arg(X) :- abs_map(_,X).
-singleton(X) :- 1 = #count { Y : abs_map(Y,X) }, abs_arg(X).
-abs_att(X',Y') :- att(X,Y), abs_map(X,X'), abs_map(Y,Y').
