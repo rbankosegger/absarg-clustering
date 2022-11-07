@@ -3,8 +3,8 @@ from graphviz import Digraph
 from clingo.control import Control
 
 if '-h' in sys.argv or len(sys.argv)<3:
-    print('usage: python output-file.gv visualize.py instance.lp')
-    print('usage: python output-file.gv visualize.py instance-concrete.lp instance-abstract.lp')
+    print('usage: python visualize.py output-file.gv instance.lp')
+    print('usage: python visualize.py output-file.gv instance.lp instance-map.lp to-clustered-af.lp')
     quit()
 output_file = sys.argv[1]
 clingo_files = sys.argv[2:]
@@ -33,6 +33,7 @@ for sym in model:
 
 
 g = Digraph('G', filename=output_file)
+g.attr('node', shape='circle')
 
 for clu, args in clusters.items():
     if len(args) == 1:
