@@ -1,0 +1,15 @@
+abs_map(a,a).	
+abs_map(h,cluster).	
+abs_map(aux2,aux2).
+abs_map(b,b).
+abs_map(d,cluster).
+abs_map(f,cluster).
+abs_map(f',cluster).
+abs_map(g,cluster).
+abs_map(i,cluster).
+abs_map(j,cluster).
+abs_map(e,cluster).
+abs_map(k,cluster).
+abs_map(l,cluster).
+abs_map(aux1,aux1).
+abs_map(c,c).
