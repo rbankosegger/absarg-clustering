@@ -1,0 +1,50 @@
+Example from Figure 1b (admissible semantics). It is already nonspurious, no refinement needed.
+Partition[5]: {a}, {b}, {c}, {d}, {e}
+Partition[3]: {a,b,c}, {d}, {e}
+Exhaustive search finished!
+
+real	0m0,046s
+user	0m0,045s
+sys	0m0,000s
+
+Example from Figure 1c (admissible semantics). Is spurious, needs refinement.
+Partition[5]: {a}, {b}, {c}, {d}, {e}
+Partition[3]: {a,b,c}, {d}, {e}
+Exhaustive search finished!
+
+real	0m0,054s
+user	0m0,050s
+sys	0m0,003s
+
+Example from Figure 3 (stable semantics), everything in a single cluster. There are no stable extensions. This method should find a refinement that captures this.
+Partition[8]: {a}, {b}, {c}, {d}, {e}, {f}, {g}, {h}
+Partition[7]: {a,b}, {c}, {d}, {e}, {f}, {g}, {h}
+Partition[6]: {a,b}, {c}, {d}, {e}, {f}, {g,h}
+Partition[5]: {a,b,g,h}, {c}, {d}, {e}, {f}
+Exhaustive search finished!
+
+real	0m26,601s
+user	0m25,972s
+sys	0m0,498s
+
+Simonshaven example (admissible semantics), starting with 'a' as singleton cluster (and everything else in a second cluster)
+Partition[15]: {a}, {aux1}, {aux2}, {b}, {c}, {d}, {e}, {f}, {f'}, {g}, {h}, {i}, {j}, {k}, {l}
+Partition[14]: {a}, {aux1}, {aux2}, {b}, {c}, {d}, {e}, {f}, {f'}, {g,h}, {i}, {j}, {k}, {l}
+Partition[5]: {a}, {aux1,aux2,f',g}, {b,f,h}, {c,d,e,k,l}, {i,j}
+Partition[4]: {a}, {aux1,aux2,c,d,f',g,i}, {b,e,f,h}, {j,k,l}
+Partition[3]: {a}, {aux1,c,d,e,f,f',g,j,k}, {aux2,b,h,i,l}
+Exhaustive search finished!
+
+real	0m6,055s
+user	0m6,003s
+sys	0m0,030s
+
+Simonshaven example (stable semantics), starting with 'a' as singleton cluster (and everything else in a second cluster)
+Partition[15]: {a}, {aux1}, {aux2}, {b}, {c}, {d}, {e}, {f}, {f'}, {g}, {h}, {i}, {j}, {k}, {l}
+Partition[4]: {a}, {aux1,aux2,b,c,d,e,f,f',i,j,k,l}, {g}, {h}
+Exhaustive search finished!
+
+real	14m15,549s
+user	14m9,674s
+sys	0m3,010s
+

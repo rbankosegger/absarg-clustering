@@ -1,0 +1,76 @@
+Example from Figure 1b (admissible semantics). It is already nonspurious, no refinement needed!
+Check Partition[3]: {a,b,c}, {d}, {e}
+Found nonspurious Partition[3]: {a,b,c}, {d}, {e}
+
+real	0m0,063s
+user	0m0,055s
+sys	0m0,007s
+
+Example from Figure 1c (admissible semantics). Is spurious, needs refinement.
+Check Partition[2]: {a,b,c,e}, {d}
+	Spurious: { abs_in(d) }
+Check Partition[3]: {a,c,e}, {b}, {d}
+	Spurious: { abs_in(d) }
+Check Partition[4]: {a}, {b}, {c,e}, {d}
+	Spurious: { abs_in(d) }
+Check Partition[5]: {a}, {b}, {c}, {d}, {e}
+Found nonspurious Partition[5]: {a}, {b}, {c}, {d}, {e}
+
+real	0m0,084s
+user	0m0,080s
+sys	0m0,004s
+
+Example from Figure 3 (stable semantics), everything in a single cluster. There are no stable extensions, i.e. also no counterexamples for refinement! The method currently fails...
+Check Partition[1]: {a,b,c,d,e,f,g,h}
+Error! No ground stable models found! Exiting...
+
+real	0m0,038s
+user	0m0,037s
+sys	0m0,000s
+
+Simonshaven example (admissible semantics), starting with 'a' as singleton cluster (and everything else in a second cluster)
+Check Partition[2]: {a}, {aux1,aux2,b,c,d,e,f,f',g,h,i,j,k,l}
+	Spurious: { abs_in(a) }
+Check Partition[3]: {a}, {aux1,c}, {aux2,b,d,e,f,f',g,h,i,j,k,l}
+	Spurious: { abs_in(a) }
+Check Partition[4]: {a}, {aux1}, {aux2,b,d,e,f,f',g,h,i,j,k,l}, {c}
+	Spurious: { abs_in(c) }
+Check Partition[5]: {a}, {aux1}, {aux2,b,e,f,f',g,h,i,j,k}, {c}, {d,l}
+	Spurious: { abs_in(c) }
+Check Partition[6]: {a}, {aux1}, {aux2,b,e,f,f',g,h,i,j,k}, {c}, {d}, {l}
+	Spurious: { abs_in(c) }
+Check Partition[8]: {a}, {aux1}, {aux2}, {b}, {c}, {d}, {e,f,f',g,h,i,j,k}, {l}
+	Spurious: { abs_in(d) }
+Check Partition[9]: {a}, {aux1}, {aux2}, {b}, {c}, {d}, {e,f,f',g,h,i,k}, {j}, {l}
+Found nonspurious Partition[9]: {a}, {aux1}, {aux2}, {b}, {c}, {d}, {e,f,f',g,h,i,k}, {j}, {l}
+
+real	0m1,277s
+user	0m1,239s
+sys	0m0,030s
+
+Simonshaven example (stable semantics), starting with 'a' as singleton cluster (and everything else in a second cluster)
+Check Partition[2]: {a}, {aux1,aux2,b,c,d,e,f,f',g,h,i,j,k,l}
+	Spurious: { abs_in(a) }
+Check Partition[3]: {a}, {aux1,c,e,h,k,l}, {aux2,b,d,f,f',g,i,j}
+	Spurious: { abs_in((aux2,b,d,f,f',g,i,j)) }
+Check Partition[4]: {a}, {aux1,c}, {aux2,b,d,f,f',g,i,j}, {e,h,k,l}
+	Spurious: { abs_in((aux2,b,d,f,f',g,i,j)) }
+Check Partition[5]: {a}, {aux1,c}, {aux2,b,d,f,f',g,i,j}, {e,k}, {h,l}
+	Spurious: { abs_in((aux2,b,d,f,f',g,i,j)) }
+Check Partition[6]: {a}, {aux1,c}, {aux2,b,d,f,f',g,i,j}, {e,k}, {h}, {l}
+	Spurious: { abs_in(a), abs_in(h), abs_in((aux2,b,d,f,f',g,i,j)) }
+Check Partition[7]: {a}, {aux1}, {aux2,b,d,f,f',g,i,j}, {c}, {e,k}, {h}, {l}
+	Spurious: { abs_in(h), abs_in(aux1), abs_in((aux2,b,d,f,f',g,i,j)) }
+Check Partition[10]: {a}, {aux1}, {aux2}, {b}, {c}, {d,g}, {e,k}, {f,f',i,j}, {h}, {l}
+	Spurious: { abs_in(h), abs_in(l), abs_in(aux1), abs_in(c), abs_in((d,g)) }
+Check Partition[13]: {a}, {aux1}, {aux2}, {b}, {c}, {d}, {e}, {f,f'}, {g}, {h}, {i,j}, {k}, {l}
+	Spurious: { abs_in(a), abs_in(h), abs_in(l), abs_in(aux1), abs_in(c), abs_in(e), abs_in(k), abs_in((f,f')) }
+Check Partition[14]: {a}, {aux1}, {aux2}, {b}, {c}, {d}, {e}, {f}, {f'}, {g}, {h}, {i,j}, {k}, {l}
+	Spurious: { abs_in(h), abs_in(l), abs_in(b), abs_in(k), abs_in(d), abs_in(f), abs_in(f') }
+Check Partition[15]: {a}, {aux1}, {aux2}, {b}, {c}, {d}, {e}, {f}, {f'}, {g}, {h}, {i}, {j}, {k}, {l}
+Found nonspurious Partition[15]: {a}, {aux1}, {aux2}, {b}, {c}, {d}, {e}, {f}, {f'}, {g}, {h}, {i}, {j}, {k}, {l}
+
+real	0m0,175s
+user	0m0,157s
+sys	0m0,017s
+

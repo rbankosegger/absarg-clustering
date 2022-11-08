@@ -1,0 +1,56 @@
+Example from Figure 3 (stable semantics), everything in a single cluster. There are no stable extensions.
+We can use the '--enumerate=all' argument to enumerate all nonspurious refinements, not just the smallest one!
+Partition[8]: {a}, {b}, {c}, {d}, {e}, {f}, {g}, {h}
+Partition[7]: {a,b}, {c}, {d}, {e}, {f}, {g}, {h}
+Partition[6]: {a,b}, {c}, {d}, {e}, {f}, {g,h}
+Partition[7]: {a}, {b,h}, {c}, {d}, {e}, {f}, {g}
+Partition[7]: {a}, {b}, {c}, {d,h}, {e}, {f}, {g}
+Partition[7]: {a}, {b}, {c}, {d}, {e}, {f}, {g,h}
+Partition[7]: {a}, {b,g}, {c}, {d}, {e}, {f}, {h}
+Partition[7]: {a,g}, {b}, {c}, {d}, {e}, {f}, {h}
+Partition[7]: {a,h}, {b}, {c}, {d}, {e}, {f}, {g}
+Partition[6]: {a,b,h}, {c}, {d}, {e}, {f}, {g}
+Partition[6]: {a,b}, {c}, {d,h}, {e}, {f}, {g}
+Partition[6]: {a,b,g}, {c}, {d}, {e}, {f}, {h}
+Partition[5]: {a,b,g,h}, {c}, {d}, {e}, {f}
+Partition[6]: {a,g}, {b,h}, {c}, {d}, {e}, {f}
+Partition[6]: {a}, {b,g,h}, {c}, {d}, {e}, {f}
+Partition[6]: {a,g,h}, {b}, {c}, {d}, {e}, {f}
+Partition[6]: {a,h}, {b,g}, {c}, {d}, {e}, {f}
+Exhaustive search finished!
+
+real	0m45,132s
+user	0m44,249s
+sys	0m0,677s
+
+Simonshaven example (admissible semantics), starting with 'a' as singleton cluster (and everything else in a second cluster)
+We can use the '--strict_ordering' argument to enumerate refinements in order (from smallest to largest)
+Without strict ordering:
+Partition[15]: {a}, {aux1}, {aux2}, {b}, {c}, {d}, {e}, {f}, {f'}, {g}, {h}, {i}, {j}, {k}, {l}
+Partition[14]: {a}, {aux1}, {aux2}, {b}, {c}, {d}, {e}, {f}, {f'}, {g,h}, {i}, {j}, {k}, {l}
+Partition[5]: {a}, {aux1,aux2,f',g}, {b,f,h}, {c,d,e,k,l}, {i,j}
+Partition[4]: {a}, {aux1,aux2,c,d,f',g,i}, {b,e,f,h}, {j,k,l}
+Partition[3]: {a}, {aux1,c,d,e,f,f',g,j,k}, {aux2,b,h,i,l}
+Exhaustive search finished!
+
+real	0m6,323s
+user	0m6,246s
+sys	0m0,053s
+
+Much faster with strict ordering:
+Partition[3]: {a}, {aux1,c,d,e,f,g,h,i,j}, {aux2,b,f',k,l}
+Exhaustive search finished!
+
+real	0m0,362s
+user	0m0,329s
+sys	0m0,031s
+
+EXPERIMENTAL: We can use the '--experimental_nogoods' argument to enable counterexample-guided nogood learning (similar to the 'refine-spurious-guided.py' techique).
+Partition[15]: {a}, {aux1}, {aux2}, {b}, {c}, {d}, {e}, {f}, {f'}, {g}, {h}, {i}, {j}, {k}, {l}
+Partition[14]: {a}, {aux1}, {aux2}, {b}, {c}, {d}, {e}, {f}, {f'}, {g,h}, {i}, {j}, {k}, {l}
+Partition[13]: {a}, {aux1}, {aux2}, {b}, {c}, {d}, {e,i,k}, {f}, {f'}, {g}, {h}, {j}, {l}
+Exhaustive search finished!
+
+real	0m28,901s
+user	0m28,343s
+sys	0m0,445s

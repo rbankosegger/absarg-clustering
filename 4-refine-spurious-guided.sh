@@ -1,6 +1,3 @@
-# Simonshaven, admissible and stable
-# Example 1, example 3 (the UNSAT one?)
-
 echo "Example from Figure 1b (admissible semantics). It is already nonspurious, no refinement needed!"
 time python refine-spurious-guided.py admissible examples/e1.lp examples/e1-map1.lp
 echo ""
