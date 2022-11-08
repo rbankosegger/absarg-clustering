@@ -10,9 +10,10 @@ https://proceedings.kr.org/2021/52/
 
 Given a finite set of arguments $A$ and
 an attack relation $R \subseteq A \times A$ we define
-an abstraction framework
+an argumentation framework (AF) as
 $F = (A,R)$
-as usual.
+per usual.
+
 
 We consider conflict-free, admissible and stable extensions
 (respectively $cf(F), adm(F), stb(F) \subseteq 2^A$)
@@ -21,11 +22,14 @@ $\mathcal F _F (S) = \\{ x \in A \mid \forall (y,x) \in R : \exists z \in S : (z
 * $S \in cf(F)$ iff there are no $a, b \in S$ such that $(a,b) \in R$. 
 * $S \in adm(F) \subseteq cf(F)$ iff $S \subseteq \mathcal F _F (S)$
 * $S \in stb(F) \subseteq cf(F)$ iff $\forall a \in A \setminus S : \exists (b,a) \in R : b \in S$
+* 
+We will refer to these definition as the "classical" or "concrete" ones, 
+as opposed to the "clustered" ones defined next.
 
 ### Existential clustering
 
-Based on a classical (or "concrete") AF $F = (A,R)$
-and a surjective mapping $m A \mapsto \hat A$
+Based on a classical $F = (A,R)$
+and a surjective mapping $m : A \mapsto \hat A$
 we define a clustered AF $\hat F = (\hat A, \hat R)$ with
 $\hat R =  \\{ (\hat a, \hat b) \mid (a, b) \in R \land m(a) = \hat a \land m(b) = \hat b \\}$.
 
