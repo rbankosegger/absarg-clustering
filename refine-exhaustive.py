@@ -1,32 +1,25 @@
 from collections import namedtuple
+import argparse
 from clingo.control import Control
 from clingo.symbol import parse_term
 import clingo
 import sys
 
-#semantics='cf'
-#semantics='admissible'
-semantics='stable'
-#lp_con = 'tests/refinement-test1-concrete.lp'
-#lp_map = 'tests/refinement-test1-cluster-mapping.lp'
-#lp_con = 'tests/refinement-test2-concrete.lp'
-#lp_map = 'tests/refinement-test2-cluster-mapping.lp'
-#lp_con = 'tests/refinement-test3-concrete.lp'
-#lp_map = 'tests/refinement-test3-cluster-mapping.lp'
-#lp_con = 'examples/e1.lp'
-#lp_map = 'examples/e1-map2.lp'
-#lp_con = 'examples/e3.lp'
-#lp_map = 'examples/e3-map2.lp'
-#lp_con = 'examples/e4-simonshaven-concrete.lp'
-#lp_map = 'examples/e4-simonshaven-mapping.lp'
-lp_con = 'examples/simonshaven.lp'
-lp_map = 'examples/simonshaven-map1.lp'
-#lp_map = 'examples/e4-simonshaven-mapping-4.lp'
-#lp_map = 'examples/e4-simonshaven-mapping-3.lp'
-#lp_con = 'examples/e5-random6-concrete.lp'
-#lp_map = 'examples/e5-random6-mapping.lp'
-#lp_con = 'examples/e6-simonshaven-simplified-concrete.lp'
-#lp_map = 'examples/e6-simonshaven-simplified-mapping1.lp'
+parser = argparse.ArgumentParser(description='Perform an exhaustive search in the space of argument partitions. Find the smallest partition that does not produce spurious counterexamples w.r.t. the selected semantics')
+parser.add_argument('semantics', choices=['cf', 'admissible', 'stable'], help='The AF semantics to work with')
+parser.add_argument('lp_af', metavar='af.lp', help='Filename to a logic program defining the concrete argumentation framework.')
+parser.add_argument('lp_map', metavar='map.lp', help='Filename to a logic program defining a mapping from concrete to abstract arguments. This mapping will be the start of the refinement procedure.')
+parser.add_argument('--enumerate', choices=['all', 'opt'], default='opt')
+parser.add_argument('--strict_ordering', action=argparse.BooleanOptionalAction, default=False)
+parser.add_argument('--experimental_nogoods', action=argparse.BooleanOptionalAction, default=False)
+
+args = parser.parse_args()
+semantics=args.semantics
+lp_af = args.lp_af
+lp_map = args.lp_map
+enumeration_mode = args.enumerate
+enumerate_in_strict_order = args.strict_ordering
+use_experimental_nogoods = args.experimental_nogoods
 
 def print_mapping(mapping, cost=[]):
 
@@ -44,7 +37,7 @@ def compute_clustered_extensions(semantics, mapping):
     ctl = Control()
     ctl.configuration.solve.models = 0
     
-    ctl.load(lp_con)
+    ctl.load(lp_af)
     ctl.add('base', [], '\n'.join(f'abs_map({k},{v}).' for k, v in mapping.items()))
     ctl.load('to-clustered-af.lp')
     
@@ -68,7 +61,7 @@ def is_spurious(semantics, mapping):
     ctl = Control()
     ctl.configuration.solve.models = 0
     
-    ctl.load(lp_con)
+    ctl.load(lp_af)
     ctl.add('base', [], '\n'.join(f'abs_map({k},{v}).' for k, v in mapping.items()))
     ctl.load('to-clustered-af.lp')
     
@@ -102,7 +95,7 @@ def is_spurious_with_refinement(semantics, mapping):
     ctl = Control()
     ctl.configuration.solve.models = 0
     
-    ctl.load(lp_con)
+    ctl.load(lp_af)
     ctl.add('base', [], '\n'.join(f'abs_map({k},{v}).' for k, v in mapping.items()))
     ctl.load('to-clustered-af.lp')
 
@@ -121,21 +114,14 @@ def is_spurious_with_refinement(semantics, mapping):
 
         noncongruents = [s for s in optimal_model.symbols(shown=True) if s.match('congruent', 2, positive=False)]
 
-        #TODO: [x]  Modify spurious-refinement.lp to return not_congruent clauses
-        #TODO: [x]  Extract and return those clauses here
-        #TODO: [x]  Form constraints from clauses
-        #TODO: [ ]  Proof: added constraints do not delete admissible abstractions
-
-
         if is_spurious:
-            #print(cex)
             return True, noncongruents
 
     return False, None
 
 ctl = Control()
 ctl.configuration.solve.models = 0
-ctl.load(lp_con)
+ctl.load(lp_af)
 ctl.load(lp_map)
 ctl.load('to-clustered-af.lp')
 ctl.load('partitions.lp')
@@ -145,36 +131,49 @@ current_best_cost = None
 admissible_mappings = list()
 
 while(True):
-    if current_best_cost:
+    # If enumeration mode is 'opt', consider only partitions that are smaller than the current best one!
+    # If enumeration mode is 'all', consider all partitions and enumerate them.
+    if enumeration_mode == 'opt' and current_best_cost:
         ctl.configuration.solve.opt_mode = f'opt, {", ".join(str(b-1) for b in current_best_cost) }'
+
     i += 1
     handle = ctl.solve(yield_=True)
-    #model = None
-    #for model in handle:
-        #pass
-    model = handle.model()
-    handle.cancel()
+
+    model = None
+    if enumerate_in_strict_order:
+        # If enumerating in strict order, always look at the very last model found by the solver (i.e. the optimal one)
+        for model in handle:
+            pass
+    else:
+        # If not enumerating in strict order, look at the first model found by the solver (i.e. allow suboptimal models)
+        model = handle.model()
+        handle.cancel()
     if not model:
         break
     symbols = model.symbols(shown=True)
     mapping = { str(lit.arguments[0]) : str(lit.arguments[1]) for lit in symbols if lit.match('abs_split', 2) }
 
-    #print(i, model.cost, current_best_cost)
-    #print(model)
+    if use_experimental_nogoods:
+        # If using experimental nogoods, try to learn clauses from spurious counterexamples.
+        # Add learned clauses to the search process!
+        is_current_mapping_spurious, noncongruents = is_spurious_with_refinement(semantics, mapping)
+    else:
+        # No experimental nogoods to add!
+        is_current_mapping_spurious = is_spurious(semantics, mapping)
+        noncongruents = []
 
-    spur = is_spurious(semantics, mapping)
-    noncongruents = []
-    #spur, noncongruents = is_spurious_with_refinement(semantics, mapping)
-    if spur:
+    if is_current_mapping_spurious:
         for nc in noncongruents:
-            #print(nc)
             ctl.add(f'nogood{i}', [], f'{nc}.')
     else:
         current_best_cost = model.cost
         print_mapping(mapping, model.cost)
         admissible_mappings.append((mapping, model.cost))
 
+    # Always add the current partition as nogood! 
+    # This ensures termination, as no partition is visited more than once.
     nogood = ':-' + ','.join(f'{lit}' for lit in symbols if lit.match('abs_split', 2)) + '.'
-    #print(nogood)
     ctl.add(f'nogood{i}', [], nogood)
     ctl.ground([(f'nogood{i}', [])])
+
+print('Exhaustive search finished!')
