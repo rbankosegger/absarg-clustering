@@ -20,8 +20,6 @@ abs_in(Y) :- abs_arg(Y), not abs_in(X) : abs_att(X,Y).
 %	 THEN		not abs_in(b)
 
 abs_defeated(Y) :- abs_in(X), abs_att(X,Y).
-abs_defeated_by(Y,X) :- abs_in(X), abs_att(X,Y).
 not abs_in(B) :- abs_in(A), not abs_defeated(A), abs_att(A,B), singleton(B).
-
 
 #show abs_in/1.
