@@ -132,22 +132,22 @@ Given some $F$, $m$, $\hat F = m(F), \sigma$ and $\hat E \in \hat \sigma (\hat F
 How can we know whether the extension $\hat E$ is spurious?
 
 Let's encode $\hat E$ as the answer set program 
-$\pi_{\hat E} = \\{ \textbf{abs_in}(\hat a). \mid \hat a \in \hat E \\}$.
+$\pi_{\hat E} = \\{ \textbf{abs\_in}(\hat a). \mid \hat a \in \hat E \\}$.
 
 We need to find an $E \in \sigma(F)$ such that $m(E) = \hat E$.
 First, consider the program 
 $\pi_F \cup \pi_m \cup \pi_{m(F)} \cup \pi_\sigma \cup \pi_{\hat \sigma}$.
 The answer sets of this compbination yield the cross product of classical and clustered extensions
-$(E, \hat E) \in \sigma(F) \times \hat \sigma( \hat F)$.
+$(X, \hat X) \in \sigma(F) \times \hat \sigma( \hat F)$.
 
-Second, we need to eliminate combinations of $E$ and $\hat E$ where $m(E) \not = \hat E$.
+Second, we need to eliminate combinations of $X$ and $\hat X$ where $m(X) \not = \hat X$.
 This is done by adding two constraints:
 
 	:- abs_in(X'), 0 = #count{ X: in(X), abs_map(X,X')}.
  	:- in(X), abs_map(X,X'), not abs_in(X').
 
 Finally, we add $\pi_{\hat E}$ to constrain the answer sets to
-$\\{ E, \hat E \mid E \in \sigma(F) \land \hat E \in \hat \Sigma ( \hat F) \land m(E) = \hat E \\}$.
+$\\{ E, \hat E \mid E \in \sigma(F) \land \hat E \in \hat \sigma ( \hat F) \land m(E) = \hat E \\}$.
 If there are no answer sets, then no $E$ corresponding to $\hat E$ could be found, i.e. $\hat E$ is spurious.o
 
 To see examples of this, investigate and run `2-is-extension-spurious.sh`.
@@ -164,9 +164,9 @@ The above procedure can be extended to achieve this by looping though the cluste
 >>
 >> if $X = \emptyset$:
 >>
->>> return "spurious"
+>>> return "spurious!"
 >>>
-> return "not spurious
+> return "not spurious!"
 		
 
 
