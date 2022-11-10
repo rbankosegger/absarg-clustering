@@ -66,7 +66,7 @@ provided in the paper
 
 The "input" answer set programs for $F=(A,R)$ and $m : A \mapsto \hat A$ are defined as follows:
 * $\pi_F = \\{ \textbf{arg} (a). \mid a \in A \\} \cup \\{ \textbf{att} (a,b). \mid (a,b) \in R \\}$.
-* $\pi_m = \\{ \textbf{abs_map} (a, \hat a). \mid a \in A, m(a) = \hat a \\}$
+* $\pi_m = \\{ \textbf{abs\\_map} (a, \hat a). \mid a \in A, m(a) = \hat a \\}$
 
 Programs of this type can be found in the `/examples` and `/tests` directories.
 
