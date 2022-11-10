@@ -77,7 +77,7 @@ The induced $m(F) = \hat F = (\hat A, \hat R)$ can be computed with:
 	abs_att(X',Y') :- att(X,Y), abs_map(X,X'), abs_map(Y,Y').
 	
 The above program can be found in `to-clustered-af.lp`. 
-In the text we refer to it also as $\pi_m(F)$.
+In the text we refer to it also as $\pi_{m(F)}$.
 
 All semantics-programs can be found in the folder `/semantics`.
 The classical semantics are defined as usual in the ASPARIX framework,
@@ -148,7 +148,7 @@ This is done by adding two constraints:
 
 Finally, we add $\pi_{\hat E}$ to constrain the answer sets to
 $\\{ E, \hat E \mid E \in \sigma(F) \land \hat E \in \hat \sigma ( \hat F) \land m(E) = \hat E \\}$.
-If there are no answer sets, then no $E$ corresponding to $\hat E$ could be found, i.e. $\hat E$ is spurious.o
+If there are no answer sets, then no $E$ corresponding to $\hat E$ could be found, i.e. $\hat E$ is spurious.
 
 To see examples of this, investigate and run `2-is-extension-spurious.sh`.
 
@@ -167,8 +167,21 @@ The above procedure can be extended to achieve this by looping though the cluste
 >>> return "spurious!"
 >>>
 > return "not spurious!"
-		
 
+This was implemented as a python program using `clingo` as answer set solver.
+The code can be found in `find_spurious.py`.
+Note that the procedure requres two nested calls to the `clingo` solver. 
+The outer call is for computing the clustered extensions, 
+the inner call to check whether that extension is spurious or not.
+
+Note that besides $\pi_{\hat E}$ the code of the inner clingo call stays the same.
+Thus, we can use clingo's Solving under Assumptions feature:
+The inner clingo program is grounded only once, before entering the loop.
+Then, during the loop, $\hat E$ is passed to the solver in the form of assumptions:
+$\\{ \textbf{abs\\_in}(\hat a) \mid \hat a \in \hat E \\} \cup \\{ \textbf{-abs\\_in}(\hat a) \mid \hat a \in \hat A \setminus \hat E  \\}
+This prevents unnecessary repetition of the grounding step and speeds up the program.
+
+To see examples of this, investigate and run `3-find-spurious.sh`
 
 ## Spurious extension guided abstraction refinement
 ## Exhaustive search for smalles abstraction
