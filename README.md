@@ -174,11 +174,11 @@ Note that the procedure requres two nested calls to the `clingo` solver.
 The outer call is for computing the clustered extensions, 
 the inner call to check whether that extension is spurious or not.
 
-Note that besides $\pi_{\hat E}$ the code of the inner clingo call stays the same.
-Thus, we can use clingo's Solving under Assumptions feature:
+Note that besides $\pi_{\hat E}$ the code of the inner answer set program stays the same.
+Thus, we utilize clingo's Solving under Assumptions feature:
 The inner clingo program is grounded only once, before entering the loop.
 Then, during the loop, $\hat E$ is passed to the solver in the form of assumptions:
-$\\{ \textbf{abs\\_in}(\hat a) \mid \hat a \in \hat E \\} \cup \\{ \textbf{-abs\\_in}(\hat a) \mid \hat a \in \hat A \setminus \hat E  \\}
+$\\{ \textbf{abs\\_in}(\hat a) \mid \hat a \in \hat E \\} \cup \\{ \textbf{-abs\\_in}(\hat a) \mid \hat a \in \hat A \setminus \hat E  \\}$
 This prevents unnecessary repetition of the grounding step and speeds up the program.
 
 To see examples of this, investigate and run `3-find-spurious.sh`
