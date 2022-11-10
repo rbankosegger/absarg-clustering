@@ -2,6 +2,11 @@
 
 ## TL;DR
 
+* We try to simplify Dung-Style Argumentation Frameworks (AFs) by partitioning arguments into clusters
+* We implement conflict-free, admissible and stable semantics for clustered arguments
+* We implement a method to identify spurious partitions which do not preserve the semantics of the original AF
+* We implement methods to automatically compute non-spurious partitions
+
 ## Preliminaries
 
 https://proceedings.kr.org/2021/52/
