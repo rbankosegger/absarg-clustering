@@ -159,12 +159,13 @@ to know whether some $\hat E \in \hat \sigma (\hat F)$ is spurious.
 
 The above procedure can be extended to achieve this by looping though the clustered extensions:
 
-> for $\hat E \in \mathcal {AS} ( \pi_F \cup \pi(m) \cup \pi_{m(F)} \cup \pi_{\hat \sigma}$:
+> for $\hat E \in \mathcal {AS} ( \pi_F \cup \pi_m \cup \pi_{m(F)} \cup \pi_{\hat \sigma} )$:
 >> $X \rightarrow \\{ E, \hat E \mid \text{obtained by above procedure} \\}$
-
+>>
 >> if $X = \emptyset$:
+>>
 >>> return "spurious"
-
+>>>
 > return "not spurious
 		
 
