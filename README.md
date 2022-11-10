@@ -161,8 +161,10 @@ The above procedure can be extended to achieve this by looping though the cluste
 
 > for $\hat E \in \mathcal {AS} ( \pi_F \cup \pi(m) \cup \pi_{m(F)} \cup \pi_{\hat \sigma}$:
 >> $X \rightarrow \\{ E, \hat E \mid \text{obtained by above procedure} \\}$
+
 >> if $X = \emptyset$:
 >>> return "spurious"
+
 > return "not spurious
 		
 
