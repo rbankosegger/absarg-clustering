@@ -19,12 +19,14 @@ We consider conflict-free, admissible and stable extensions
 (respectively $cf(F), adm(F), stb(F) \subseteq 2^A$)
 defined in the standard way based on the characteristic function
 $\mathcal F _F (S) = \\{ x \in A \mid \forall (y,x) \in R : \exists z \in S : (z,y) \in R \\}$.
-#* $S \in cf(F)$ iff there are no $a, b \in S$ such that $(a,b) \in R$. 
-#* $S \in adm(F) \subseteq cf(F)$ iff $S \subseteq \mathcal F _F (S)$
-#* $S \in stb(F) \subseteq cf(F)$ iff $\forall a \in A \setminus S : \exists (b,a) \in R : b \in S$
-#* ...
-#* $cf(F) = \\{ S \subseteq A \mid \forall (a,b) \in R : a \not \in S \lor b \not \in S \\}$
-#* $cf(F) = \\{ S \subseteq A \mid \forall a,b \in A : (a \in S \land b \in S) \rightarrow  (a,b)  \not \in R \}}$
+<!-- 
+* $S \in cf(F)$ iff there are no $a, b \in S$ such that $(a,b) \in R$. 
+* $S \in adm(F) \subseteq cf(F)$ iff $S \subseteq \mathcal F _F (S)$
+* $S \in stb(F) \subseteq cf(F)$ iff $\forall a \in A \setminus S : \exists (b,a) \in R : b \in S$
+* ...
+* $cf(F) = \\{ S \subseteq A \mid \forall (a,b) \in R : a \not \in S \lor b \not \in S \\}$
+* $cf(F) = \\{ S \subseteq A \mid \forall a,b \in A : (a \in S \land b \in S) \rightarrow  (a,b)  \not \in R \}}$
+-->
 * $cf(F) = \\ { S \subseteq A \mid \forall a,b \in S : (a,b) \not \in R \}}$
 * $adm(F) = \\{ S \in cf(F) \mid S \subseteq \mathcal F _F (S) \\}$
 * $stb(F) = \\{ S \in cf(F) \mid \forall a \in A \setminus S : \exists (b,a) \in R : b \in S \\}$
