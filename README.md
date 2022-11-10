@@ -19,7 +19,7 @@ We consider conflict-free, admissible and stable extensions
 (respectively $cf(F), adm(F), stb(F) \subseteq 2^A$)
 defined in the standard way based on the characteristic function
 $\mathcal F _F (S) = \\{ x \in A \mid \forall (y,x) \in R : \exists z \in S : (z,y) \in R \\}$.
-* $cf(F) = \\ { S \subseteq A \mid \forall a,b \in S : (a,b) \not \in R \}}$
+* $cf(F) = \\{ S \subseteq A \mid \forall a,b \in S : (a,b) \not \in R \\}$
 * $adm(F) = \\{ S \in cf(F) \mid S \subseteq \mathcal F _F (S) \\}$
 * $stb(F) = \\{ S \in cf(F) \mid \forall a \in A \setminus S : \exists (b,a) \in R : b \in S \\}$
 
