@@ -132,7 +132,7 @@ Given some $F$, $m$, $\hat F = m(F), \sigma$ and $\hat E \in \hat \sigma (\hat F
 How can we know whether the extension $\hat E$ is spurious?
 
 Let's encode $\hat E$ as the answer set program 
-$\pi_{\hat E} = \\{ \textbf{abs\_in}(\hat a). \mid \hat a \in \hat E \\}$.
+$\pi_{\hat E} = \\{ \texttt{abs_in}(\hat a). \mid \hat a \in \hat E \\}$.
 
 We need to find an $E \in \sigma(F)$ such that $m(E) = \hat E$.
 First, consider the program 
