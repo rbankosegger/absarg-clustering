@@ -33,6 +33,10 @@ and a surjective mapping $m : A \mapsto \hat A$
 we define a clustered AF $\hat F = (\hat A, \hat R)$ with
 $\hat R =  \\{ (\hat a, \hat b) \mid (a, b) \in R \land m(a) = \hat a \land m(b) = \hat b \\}$.
 
+For convenience we extend $m$ as follows:
+* $m(S) = \\{ m(a) \mid a \in A \\}$
+* $m(F) = \hat F = (\hat A, \hat R)$
+
 The mapping $m$ and the clustered arguments $\hat a \in \hat A$ induce a partition over the classical arguments:
 $A = \biguplus _ {\hat a \in \hat A} m^{-1}(\hat a)$.
 Let $single(\hat A) = \\{ \hat a \in \hat A \mid |m^{-1}(\hat a)| = 1 \\}$
@@ -42,16 +46,12 @@ We define conflict-free, admissible and stable extensions for the clustered AF
 (respectively $\hat {cf}(\hat F), \hat {adm}(\hat F), \hat {stb}(\hat F) \subseteq 2^{\hat A}$).
 * $\hat {cf}  ( \hat F) = \\{ \hat E \subseteq \hat A \mid \forall \hat a, \hat b \in single(\hat E): (\hat a, \hat b) \not \in \hat R \\} $
 * $\hat {adm} ( \hat F) = \\{ \hat E \in \hat {cf} ( \hat F) \mid \forall \hat a \in single(\hat E) : (\hat b, \hat a) \in \hat R \rightarrow \exists \hat c \in \hat E : (\hat c, \hat b) \in \hat R \\} $
+* $\hat {stb} ( \hat F) = \\{ \hat E \in \hat {cf} ( \hat F) \mid ( \hat b \not \in \hat E \rightarrow \exists \hat a \in \hat E : (\hat a, \hat b) \in \hat R) \land (\forall \hat \a \in \hat E : (\lnot \exists \hat x \in \hat E : (\hat x, \hat a) \in \hat R) \land (\hat a, \hat b) \in \hat R \land \hat b \in single(\hat A) ) \rightarrow \hat b \not \in \hat E \\}$
 
-
-
-define...
-	single(E)
-	definition 10
-		cf, adm, stb
-		
-	definition 8
-		abstracting, spurious, faithful
+Finally, for some $F$, mapping $m$  and classical (resp. clustered) semantics $\sigma(F)$ ($\hat \sigma (m(F))$), 
+we say that:
+* $\hat E \in \hat \sigma (m(F))$ is spurious w.r.t. $F$ under $\sigma$ if $\not \exists E \in \sigma (F) : m(E) = \hat E$
+* $m(F)$ under $\hat \sigma$ is faithful w.r.t. $F$ under $\sigma$ if there is no spurious $\hat E \in \hat \sigma ( \hat m(F) )$ w.r.t $F$ under $\sigma$.
 
 ### Implementaton of confrict-flee and admissible clustered semantics
 
