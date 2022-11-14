@@ -194,7 +194,8 @@ Note that the procedure requres two nested calls to the `clingo` solver.
 The outer call is for computing the clustered extensions, 
 the inner call to check whether that extension is spurious or not.
 
-Note that besides $\pi_{\hat E}$ the code of the inner answer set program stays the same.
+Note that besides $\pi_{\hat E}$, the inner ASP encoding is invariant  
+during the loop iteration.
 Thus, we utilize clingo's Solving under Assumptions feature:
 The inner clingo program is grounded only once, before entering the loop.
 Then, during the loop, $\hat E$ is passed to the solver in the form of assumptions.
