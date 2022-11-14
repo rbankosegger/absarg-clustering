@@ -150,7 +150,7 @@ Recall the ASP encodings defined above:
 
 Consider the program 
 $\pi_F \cup \pi_m \cup \pi_{m(F)} \cup \pi_\sigma \cup \pi_{\hat \sigma}$.
-The answer sets of this compbination yield the cross product of classical and clustered extensions
+The answer sets of this combination yield the cross product of classical and clustered extensions
 $(X, \hat X) \in \sigma(F) \times \hat \sigma( \hat F)$.
 
 Second, we need to eliminate combinations of $X$ and $\hat X$ where $m(X) \not = \hat X$.
@@ -161,12 +161,14 @@ This is done by adding two constraints:
 	
 Let's refer to these two constraints as $\pi_{m(X) \not = \hat X}$.
 
-Finally, we need to constrain the search to classical extensions that map to $\hat E$.
+Finally, we need to constrain the search to clustered extensions that map to $\hat E$.
 Let's encode $\hat E$ as the answer set program 
-$\pi_{\hat E} = \\{ \textbf{abs\\_in}(\hat a) \mid \hat a \in \hat E \\} \cup \\{ \textbf{-abs\\_in}(\hat a) \mid \hat a \in \hat A \setminus \hat E  \\}$.
+$\pi_{\hat E} = \\{ \textbf{abs\\_in}(\hat a) \mid \hat a \in \hat E \\} \cup \\{ \textbf{-abs\\_in}(\hat a) \mid \hat a \in \hat A \setminus \hat E  \\}$
+and add it to constrain the answer sets accordingly.
+The final procedure is:
 
-We can simply add $\pi_{\hat E}$ to constrain the answer sets to
-$\\{ X, \hat E \mid X \in \sigma(F) \land \land m(E) = \hat E \\}$.
+$\mathcal {AS} ( \pi_F \cup \pi_m \cup \pi_{m(F)} \cup \pi_\sigma \cup \pi_{\hat \sigma} \cup \pi_{\hat E} \cup \pi_{m(X) \not = \hat X} ) = \\{ X, \hat E \mid X \in \sigma(F) \land m(X) = \hat E \\}$
+
 If there are no answer sets, then no $X$ corresponding to $\hat E$ could be found, 
 i.e. $\hat E$ is spurious.
 
