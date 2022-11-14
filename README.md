@@ -159,7 +159,7 @@ This is done by adding two constraints:
 	:- abs_in(X'), 0 = #count{ X: in(X), abs_map(X,X')}.
  	:- in(X), abs_map(X,X'), not abs_in(X').
 	
-Let's refer to these two constraints as $\pi_{m(X) \not = \hat X}$.
+Let's refer to these two constraints as $\pi_{m(X) = \hat X}$.
 
 Finally, we need to constrain the search to clustered extensions that map to $\hat E$.
 Let's encode $\hat E$ as the answer set program 
@@ -167,7 +167,7 @@ $\pi_{\hat E} = \\{ \textbf{abs\\_in}(\hat a) \mid \hat a \in \hat E \\} \cup \\
 and add it to constrain the answer sets accordingly.
 The final procedure is:
 
-$\mathcal {AS} ( \pi_F \cup \pi_m \cup \pi_{m(F)} \cup \pi_\sigma \cup \pi_{\hat \sigma} \cup \pi_{\hat E} \cup \pi_{m(X) \not = \hat X} ) \cong \\{ X, \hat E \mid X \in \sigma(F) \land m(X) = \hat E \\}$
+$\mathcal {AS} ( \pi_F \cup \pi_m \cup \pi_{m(F)} \cup \pi_\sigma \cup \pi_{\hat \sigma} \cup \pi_{\hat E} \cup \pi_{m(X) = \hat X} ) \cong \\{ X, \hat E \mid X \in \sigma(F) \land m(X) = \hat E \\}$
 
 If there are no answer sets, then no $X$ corresponding to $\hat E$ could be found, 
 i.e. $\hat E$ is spurious.
@@ -182,7 +182,7 @@ to know whether some $\hat E \in \hat \sigma (\hat F)$ is spurious.
 The above procedure can be extended to achieve this by looping though the clustered extensions:
 
 > for $\hat E \in \mathcal {AS} ( \pi_F \cup \pi_m \cup \pi_{m(F)} \cup \pi_{\hat \sigma} )$:
->> $X \leftarrow \mathcal {AS} ( \pi_F \cup \pi_m \cup \pi_{m(F)} \cup \pi_\sigma \cup \pi_{\hat \sigma} \cup \pi_{\hat E} \cup \pi_{m(X) \not = \hat X} )$
+>> $X \leftarrow \mathcal {AS} ( \pi_F \cup \pi_m \cup \pi_{m(F)} \cup \pi_\sigma \cup \pi_{\hat \sigma} \cup \pi_{\hat E} \cup \pi_{m(X) = \hat X} )$
 >>
 >> if $X = \emptyset$ return "spurious!"
 >>
