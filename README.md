@@ -6,6 +6,7 @@
 * We implement conflict-free, admissible and stable semantics for clustered arguments
 * We implement a method to identify spurious partitions which do not preserve the semantics of the original AF
 * We implement methods to automatically compute non-spurious partitions
+* All implementations are done in Answer Set Programming (ASP) and Python 3
 
 ## Preliminaries
 
@@ -96,7 +97,9 @@ classical (resp. clustered) semantics as $\pi_{\sigma}$ ( $\pi_{\hat \sigma}$).
 
 ### Clustered Conflict-Free and Clustered Admissible Semantics
 
-The ASP implementation of these semantics are described in the text.
+The ASP implementation of these semantics are described in the paper.
+
+TODO: Reference
 
 For the Clustered Conflict-Free case we have:
 
@@ -135,12 +138,17 @@ To run the tests, execute in a terminal:
 
 Given some $F$, $m$, $\hat F = m(F), \sigma$ and $\hat E \in \hat \sigma (\hat F)$.
 How can we know whether the extension $\hat E$ is spurious?
+We need to find an $E \in \sigma(F)$ such that $m(E) = \hat E$ if no such $E$ can be found, 
+we know that $\hat E$ is spurious..
 
-Let's encode $\hat E$ as the answer set program 
-$\pi_{\hat E} = \\{ \textbf{abs\\_in}(\hat a). \mid \hat a \in \hat E \\}$.
+Recall the ASP encodings defined above:
+* $\pi_F = \\{ \textbf{arg} (a). \mid a \in A \\} \cup \\{ \textbf{att} (a,b). \mid (a,b) \in R \\}$.
+* $\pi_m = \\{ \textbf{abs\\_map} (a, \hat a). \mid a \in A, m(a) = \hat a \\}$
+* $\pi_{m(F)}$ (found in `to-clustered-af.lp`) to deduce $\textbf{abs\\_arg}/1$, $\textbf{singleton}/1$ and $\textbf{abs\\_att}/2$.
+* $\pi_{\sigma}$ to deduce $\textbf{in}/1$
+* $\pi_{\hat \sigma}$ to deduce $\textbf{abs\\_in}/1$
 
-We need to find an $E \in \sigma(F)$ such that $m(E) = \hat E$.
-First, consider the program 
+Consider the program 
 $\pi_F \cup \pi_m \cup \pi_{m(F)} \cup \pi_\sigma \cup \pi_{\hat \sigma}$.
 The answer sets of this compbination yield the cross product of classical and clustered extensions
 $(X, \hat X) \in \sigma(F) \times \hat \sigma( \hat F)$.
@@ -150,10 +158,17 @@ This is done by adding two constraints:
 
 	:- abs_in(X'), 0 = #count{ X: in(X), abs_map(X,X')}.
  	:- in(X), abs_map(X,X'), not abs_in(X').
+	
+Let's refer to these two constraints as $\pi_{m(X) \not = \hat X}$.
 
-Finally, we add $\pi_{\hat E}$ to constrain the answer sets to
-$\\{ E, \hat E \mid E \in \sigma(F) \land \hat E \in \hat \sigma ( \hat F) \land m(E) = \hat E \\}$.
-If there are no answer sets, then no $E$ corresponding to $\hat E$ could be found, i.e. $\hat E$ is spurious.
+Finally, we need to constrain the search to classical extensions that map to $\hat E$.
+Let's encode $\hat E$ as the answer set program 
+$\pi_{\hat E} = \\{ \textbf{abs\\_in}(\hat a) \mid \hat a \in \hat E \\} \cup \\{ \textbf{-abs\\_in}(\hat a) \mid \hat a \in \hat A \setminus \hat E  \\}$.
+
+We can simply add $\pi_{\hat E}$ to constrain the answer sets to
+$\\{ X, \hat E \mid X \in \sigma(F) \land \land m(E) = \hat E \\}$.
+If there are no answer sets, then no $X$ corresponding to $\hat E$ could be found, 
+i.e. $\hat E$ is spurious.
 
 To see examples of this, investigate and run `2-is-extension-spurious.sh`.
 
@@ -165,7 +180,7 @@ to know whether some $\hat E \in \hat \sigma (\hat F)$ is spurious.
 The above procedure can be extended to achieve this by looping though the clustered extensions:
 
 > for $\hat E \in \mathcal {AS} ( \pi_F \cup \pi_m \cup \pi_{m(F)} \cup \pi_{\hat \sigma} )$:
->> $X \leftarrow \\{ E, \hat E \mid \text{obtained by above procedure} \\}$
+>> $X \leftarrow \mathcal {AS} ( \pi_F \cup \pi_m \cup \pi_{m(F)} \cup \pi_\sigma \cup \pi_{\hat \sigma} \cup \pi_{\hat E} \cup \pi_{m(X) \not = \hat X} )$
 >>
 >> if $X = \emptyset$ return "spurious!"
 >>
@@ -180,8 +195,7 @@ the inner call to check whether that extension is spurious or not.
 Note that besides $\pi_{\hat E}$ the code of the inner answer set program stays the same.
 Thus, we utilize clingo's Solving under Assumptions feature:
 The inner clingo program is grounded only once, before entering the loop.
-Then, during the loop, $\hat E$ is passed to the solver in the form of assumptions:
-$\\{ \textbf{abs\\_in}(\hat a) \mid \hat a \in \hat E \\} \cup \\{ \textbf{-abs\\_in}(\hat a) \mid \hat a \in \hat A \setminus \hat E  \\}$
+Then, during the loop, $\hat E$ is passed to the solver in the form of assumptions.
 This prevents unnecessary repetition of the grounding step and speeds up the program.
 
 To see examples of this, investigate and run `3-find-spurious.sh`
