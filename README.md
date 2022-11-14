@@ -199,7 +199,7 @@ during the loop iteration.
 Thus, we utilize clingo's Solving under Assumptions feature:
 The inner clingo program is grounded only once, before entering the loop.
 Then, during the loop, $\hat E$ is passed to the solver in the form of assumptions.
-This prevents unnecessary repetition of the grounding step and speeds up the program.
+This prevents unnecessary repetition of the grounding step and speeds up the procedure.
 
 To see examples of this, investigate and run `3-find-spurious.sh`
 
