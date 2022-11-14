@@ -204,6 +204,31 @@ This prevents unnecessary repetition of the grounding step and speeds up the pro
 To see examples of this, investigate and run `3-find-spurious.sh`
 
 ## Spurious extension guided abstraction refinement
+Given some $F$, $\sigma$ and $\hat \sigma$ we would like to find a suitable
+abstraction mapping $m$.
+Suitability in our case refers to minimality w.r.t. the size of the induced partition $|\hat A|$.
+
+The first procedure is inspired by the counterexample-guided abstraction refinement (CEGAR) procedure which
+enjoys much success in the field of model checking.
+We start with a coarse mapping. Usually, this means mapping every argument to one and the same cluster,
+with the exception of some arguments for wich we would like to prove credulous / sceptical acceptance in the resulting clustered AF.
+Those are mapped to singleton clusters (i.e. to themselves).
+
+TODO: Simonshaven example
+
+Once the coarse mapping is established, we try to find spurious clustered extensions similar to above. 
+If none exist, the abstraction is faithful and we are done.
+If a spurious clustered extension is found, we would like to refine the abstraction mapping such that
+this clustered extension can no longer occur.
+
+
+
+
+
+
+
 ## Exhaustive search for smalles abstraction
+
+## Benchmarks
 
 ## Future work
