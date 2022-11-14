@@ -167,7 +167,7 @@ $\pi_{\hat E} = \\{ \textbf{abs\\_in}(\hat a) \mid \hat a \in \hat E \\} \cup \\
 and add it to constrain the answer sets accordingly.
 The final procedure is:
 
-$\mathcal {AS} ( \pi_F \cup \pi_m \cup \pi_{m(F)} \cup \pi_\sigma \cup \pi_{\hat \sigma} \cup \pi_{\hat E} \cup \pi_{m(X) = \hat X} ) \cong \\{ X, \hat X \mid X \in \sigma(F) \land \hat X \in \hat \sigma(\hat F) \land m(X) = \hat X \land \hat X = \hat E \\}$
+$\mathcal {AS} ( \pi_F \cup \pi_m \cup \pi_{m(F)} \cup \pi_\sigma \cup \pi_{\hat \sigma} \cup \pi_{m(X) = \hat X} \cup \pi_{\hat E} ) \cong \\{ X, \hat X \mid X \in \sigma(F) \land \hat X \in \hat \sigma(\hat F) \land m(X) = \hat X \land \hat X = \hat E \\}$
 
 If there are no answer sets, then no $X$ corresponding to $\hat E$ could be found, 
 i.e. $\hat E$ is spurious.
@@ -182,7 +182,7 @@ to know whether some $\hat E \in \hat \sigma (\hat F)$ is spurious.
 The above procedure can be extended to achieve this by looping though the clustered extensions:
 
 > for $\hat E \in \mathcal {AS} ( \pi_F \cup \pi_m \cup \pi_{m(F)} \cup \pi_{\hat \sigma} )$:
->> $X \leftarrow \mathcal {AS} ( \pi_F \cup \pi_m \cup \pi_{m(F)} \cup \pi_\sigma \cup \pi_{\hat \sigma} \cup \pi_{\hat E} \cup \pi_{m(X) = \hat X} )$
+>> $X \leftarrow \mathcal {AS} ( \pi_F \cup \pi_m \cup \pi_{m(F)} \cup \pi_\sigma \cup \pi_{\hat \sigma} \cup \pi_{m(X) = \hat X} \cup \pi_{\hat E} )$
 >>
 >> if $X = \emptyset$ return "spurious!"
 >>
