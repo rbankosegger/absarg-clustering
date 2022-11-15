@@ -340,6 +340,7 @@ We test the following procedures
 * Exhaustive
 
 | Example                     | Method          | Time     | Size | Partition                                                   |
+| --------------------------- | --------------- | -------- | ---- | ----------------------------------------------------------- |
 | Fig1c, $\sigma = adm$       | Spurious-guided | $<1s$    | 5    | `{a}, {b}, {c}, {d}, {e}`                                   |
 | Fig1c, $\sigma = adm$       | Exhaustive      | $<1s$    | 3    | `{a,b,c}, {d}, {e}` ( = Figure 1a)                          |
 | Fig3, $\sigma = stb$        | Spurious-guided | NA       | NA   | NA                                                          |
