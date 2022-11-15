@@ -10,7 +10,7 @@
 
 ## Preliminaries
 
-
+In this chapter we recite the central definitions from [^1].
 
 ### Argumentation frameworks
 
@@ -18,7 +18,7 @@ Given a finite set of arguments $A$ and
 an attack relation $R \subseteq A \times A$ we define
 an argumentation framework (AF) as
 $F = (A,R)$
-per usual.
+per usual [^1].
 
 
 We consider conflict-free, admissible and stable extensions
@@ -37,7 +37,7 @@ as opposed to the "clustered" ones defined next.
 Based on a classical $F = (A,R)$
 and a surjective mapping $m : A \mapsto \hat A$
 we define a clustered AF $\hat F = (\hat A, \hat R)$ with
-$\hat R =  \\{ (\hat a, \hat b) \mid (a, b) \in R \land m(a) = \hat a \land m(b) = \hat b \\}$.
+$\hat R =  \\{ (\hat a, \hat b) \mid (a, b) \in R \land m(a) = \hat a \land m(b) = \hat b \\}$ [^1].
 
 For convenience we extend $m$ as follows:
 * $m(S) = \\{ m(a) \mid a \in A \\}$
@@ -59,18 +59,26 @@ we say that:
 * $\hat E \in \hat \sigma (m(F))$ is spurious w.r.t. $F$ under $\sigma$ if $\not \exists E \in \sigma (F) : m(E) = \hat E$
 * $m(F)$ under $\hat \sigma$ is faithful w.r.t. $F$ under $\sigma$ if there is no spurious $\hat E \in \hat \sigma ( \hat m(F) )$ w.r.t $F$ under $\sigma$.
 
+### Examples 
 
+We use several examples from Saribatur and Wallner 2021[^1].
 
-provided in the paper
+* Figure 1 in the paper can be found as `examples/e1...` in the code. The meaning of the different `.lp` files are explained below.
+![Figure 1, Saribatur and Wallner 2021](examples/e1.png)
 
+* Figure 3 in the paper can be found as `examples/e3...` in the code. The meaning of the different `.lp` files are explained below.
+![Figure 3, Saribatur and Wallner 2021](examples/e3.png)
 
-### Examples from the paper
+* The Simonshaven case from Prakken 2019[^3] serves as a practical application of the abstraction techniques. It was convereted into a classical-Af format by Saribatur and Wallner in their lecture notes (no public reference).
+![Simonshaven, Prakken 2019](examples/simonshaven.png)
+
 ### Simonshaven example
 
 
 ## Implementation of clustered semantics
 
-The "input" answer set programs for $F=(A,R)$ and $m : A \mapsto \hat A$ are defined as follows:
+
+The answer set programs for $F=(A,R)$ and $m : A \mapsto \hat A$ are defined as follows:
 * $\pi_F = \\{ \textbf{arg} (a). \mid a \in A \\} \cup \\{ \textbf{att} (a,b). \mid (a,b) \in R \\}$.
 * $\pi_m = \\{ \textbf{abs\\_map} (a, \hat a). \mid a \in A, m(a) = \hat a \\}$
 
@@ -86,21 +94,25 @@ The above program can be found in `to-clustered-af.lp`.
 In the text we refer to it also as $\pi_{m(F)}$.
 
 All semantics-programs can be found in the folder `/semantics`.
-The classical semantics are defined as usual in the ASPARIX framework,
+The classical semantics are defined as usual[^2],
 where $\textbf{in} (a)$ is true in some answer set iff $a \in S$ 
 for the extension $S$ that corresponds to that answer set.
 
-TODO: Reference![^1]
+We will refer to the ASP encodings of the 
+classical semantics as 
+$\pi_{\sigma}$ for $\sigma \in \\{ cf, adm, stb \\}$
+and for clustered semantics as 
+$\pi_{\hat \sigma}$ for $\hat \sigma \in \\{ \hat{cf}, \hat{adm}, \hat{stb} \\}$.
 
-We will refer to the encoding of the 
-classical (resp. clustered) semantics as $\pi_{\sigma}$ ( $\pi_{\hat \sigma}$).
+The extensions are computed as follows:
+
+* $\sigma (F) \cong \mathcal{AS} ( \pi_F \cup \pi_{\sigma} )$
+* $\sigma (m(F)) \cong \mathcal{AS} ( \pi_F \cup \pi_m \cup \pi_{m(F)} \cup \pi_{\hat \sigma} )$
+
 
 ### Clustered Conflict-Free and Clustered Admissible Semantics
 
-The ASP implementation of these semantics are described in the paper.
-
-TODO: Reference[^1]
-
+The ASP implementation of these semantics are described in Saribatur and Wallner 2021[^1].
 For the Clustered Conflict-Free case we have:
 
 	{ abs_in(X) : abs_arg(X) }.
@@ -123,7 +135,8 @@ It was implemented as follows:
 	abs_defeated(Y) :- abs_in(X), abs_att(X,Y).
 	not abs_in(B) :- abs_in(A), not abs_defeated(A), abs_att(A,B), singleton(B).
   
-The third line was inspired by the ASPRIX-Implementation of the classical stable semantics.
+The third line was inspired by the ASPARTIX-Implementation of the classical stable semantics[^2].
+
 
 To ensure correctness, we tested the semantics with several instances:
  * `tests/cstable-1` ensures the clustered semantics reduce to the classical ones when every clustered argument is singleton
@@ -312,5 +325,6 @@ Observation:
 
 ## Future work
 
-## References
 [^1]: Saribatur, Z. G., & Wallner, J. P. (2021, September). Existential Abstraction on Argumentation Frameworks via Clustering. In Proceedings of the International Conference on Principles of Knowledge Representation and Reasoning (Vol. 18, No. 1, pp. 549-559). https://proceedings.kr.org/2021/52/
+[^2]: Dvořák, W., König, M., Rapberger, A., Wallner, J. P., & Woltran, S. (2021). ASPARTIX-V - A Solver for Argumentation Tasks Using ASP. https://www.dbai.tuwien.ac.at/research/argumentation/aspartix/papers/ASPOCP_2021.pdf
+[^3]: Prakken, H. (2020). An argumentation‐based analysis of the Simonshaven case. Topics in cognitive science, 12(4), 1068-1091. https://onlinelibrary.wiley.com/doi/full/10.1111/tops.12418
