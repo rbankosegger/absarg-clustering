@@ -314,13 +314,13 @@ With this we construct the following procedure:
 		if not needs refinement
 			break
 
-> $m \leftarrow \text{(coarse) initial mapping}$
+> $m \leftarrow \text{coarse initial mapping}$
 >
-> while $\textbf{True}$
+> while $\textbf{True}$:
 >> $refine \leftarrow \textbf{False}$
 >>
 >> for $\hat E \in \mathcal {AS} ( \pi_F \cup \pi_m \cup \pi_{m(F)} \cup \pi_{\hat \sigma} )$:
->>> $I \leftarrow an optimal answer set from \mathcal {AS} ( \pi_F \cup \pi_m \cup \pi_{m(F)} \cup \pi_\sigma \cup \pi_{\hat \sigma} \cup \pi_{m(X) = \hat X} \cup \pi_{\hat E} )$
+>>> $I \leftarrow$ an optimal answer set from $\mathcal {AS} ( \pi_F \cup \pi_m \cup \pi_{m(F)} \cup \pi_\sigma \cup \pi_{\hat \sigma} \cup \pi_{m(X) = \hat X} \cup \pi_{\hat E} )$
 >>>
 >>> if $cost(I) > 0$:
 >>>> $m \leftarrow$ extract refined mapping from $\textbf{abs\\_map\\_refined}/2$ predicates in $I$
@@ -329,8 +329,8 @@ With this we construct the following procedure:
 >>>>
 >>>> break 
 >>>
->>> if $refine = \textbf{False}$:
->>>		break
+>> if $refine = \textbf{False}$:
+>>		break
 >
 > return $m$
 
