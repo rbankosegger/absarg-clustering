@@ -181,7 +181,7 @@ $\pi_{\hat E} = \\{ \textbf{abs\\_in}(\hat a) \mid \hat a \in \hat E \\} \cup \\
 and add it to constrain the answer sets accordingly.
 The final procedure is:
 
-$\mathcal {AS} ( \pi_F \cup \pi_m \cup \pi_{m(F)} \cup \pi_\sigma \cup \pi_{\hat \sigma} \cup \pi_{m(X) = \hat X} \cup \pi_{\hat E} ) \cong \\{ X, \hat X \in \sigma(F) \times \hat \sigma( \hat F) \mid m(X) = \hat X \land \hat X = \hat E \\}$
+$\mathcal {AS} ( \pi_F \cup \pi_m \cup \pi_{m(F)} \cup \pi_\sigma \cup \pi_{\hat \sigma} \cup \pi_{m(X) = \hat X} \cup \pi_{\hat E} ) \cong \\{ (X, \hat X) \in \sigma(F) \times \hat \sigma( \hat F) \mid m(X) = \hat X \land \hat X = \hat E \\}$
 
 If there are no answer sets, then no $X$ corresponding to $\hat E$ could be found, 
 i.e. $\hat E$ is spurious.
