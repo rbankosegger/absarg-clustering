@@ -54,6 +54,8 @@ We define conflict-free, admissible and stable extensions for the clustered AF
 * $\hat {adm} ( \hat F) = \\{ \hat E \in \hat {cf} ( \hat F) \mid \forall \hat a \in single(\hat E) : (\hat b, \hat a) \in \hat R \rightarrow \exists \hat c \in \hat E : (\hat c, \hat b) \in \hat R \\} $
 * $\hat {stb} ( \hat F) = \\{ \hat E \in \hat {cf} ( \hat F) \mid ( \hat b \not \in \hat E \rightarrow \exists \hat a \in \hat E : (\hat a, \hat b) \in \hat R) \land (\forall \hat \a \in \hat E : (\lnot \exists \hat x \in \hat E : (\hat x, \hat a) \in \hat R) \land (\hat a, \hat b) \in \hat R \land \hat b \in single(\hat A) ) \rightarrow \hat b \not \in \hat E \\}$
 
+TODO: Fix stable semantics above!
+
 Finally, for some $F$, mapping $m$  and classical (resp. clustered) semantics $\sigma(F)$ ( $\hat \sigma (m(F))$ ), 
 we say that:
 * $\hat E \in \hat \sigma (m(F))$ is spurious w.r.t. $F$ under $\sigma$ if $\not \exists E \in \sigma (F) : m(E) = \hat E$
@@ -72,13 +74,11 @@ We use several examples from Saribatur and Wallner 2021[^1].
 * The Simonshaven case from Prakken 2019[^3] serves as a practical application of the abstraction techniques. It was convereted into a classical-Af format by Saribatur and Wallner in their lecture notes (no public reference).
 ![Simonshaven, Prakken 2019](examples/simonshaven.png)
 
-### Simonshaven example
 
+## Implementation of semantics
 
-## Implementation of clustered semantics
-
-
-The answer set programs for $F=(A,R)$ and $m : A \mapsto \hat A$ are defined as follows:
+The semantics were implemented in Answer Set Programming (ASP).
+The ASP encodings for $F=(A,R)$ and $m : A \mapsto \hat A$ are defined as follows:
 * $\pi_F = \\{ \textbf{arg} (a). \mid a \in A \\} \cup \\{ \textbf{att} (a,b). \mid (a,b) \in R \\}$.
 * $\pi_m = \\{ \textbf{abs\\_map} (a, \hat a). \mid a \in A, m(a) = \hat a \\}$
 
@@ -93,16 +93,18 @@ The induced $m(F) = \hat F = (\hat A, \hat R)$ can be computed with:
 The above program can be found in `to-clustered-af.lp`. 
 In the text we refer to it also as $\pi_{m(F)}$.
 
-All semantics-programs can be found in the folder `/semantics`.
 The classical semantics are defined as usual[^2],
 where $\textbf{in} (a)$ is true in some answer set iff $a \in S$ 
 for the extension $S$ that corresponds to that answer set.
+The clustered semantics are defined below, were $\textbf{abs\\_in} (a)$ is true in some answer set iff 
+$\hat a \in \hat S$ for the clustered extension $\hat S$ that corresponds to that answer set.
 
 We will refer to the ASP encodings of the 
 classical semantics as 
 $\pi_{\sigma}$ for $\sigma \in \\{ cf, adm, stb \\}$
 and for clustered semantics as 
 $\pi_{\hat \sigma}$ for $\hat \sigma \in \\{ \hat{cf}, \hat{adm}, \hat{stb} \\}$.
+The semantics-related encodings can be found in the folder `/semantics`.
 
 The extensions are computed as follows:
 
@@ -137,8 +139,7 @@ It was implemented as follows:
   
 The third line was inspired by the ASPARTIX-Implementation of the classical stable semantics[^2].
 
-
-To ensure correctness, we tested the semantics with several instances:
+To ensure correctness, we tested the stable semantics with several instances:
  * `tests/cstable-1` ensures the clustered semantics reduce to the classical ones when every clustered argument is singleton
  * `/tests/cstable-2` ensures that not-attacked clusters are always accepted, always-attacked singletons are never accepted and always-attacked clusteres can be both accepted or not.
  * `/tests/cstable-3` and `/tests/cstable-4` have different concrete AF's but their mapping induces the same clustered AF. Thus, their clustered semantics should yield the same extensions.
