@@ -158,7 +158,7 @@ we know that $\hat E$ is spurious..
 Recall the ASP encodings defined above:
 * $\pi_F = \\{ \textbf{arg} (a). \mid a \in A \\} \cup \\{ \textbf{att} (a,b). \mid (a,b) \in R \\}$.
 * $\pi_m = \\{ \textbf{abs\\_map} (a, \hat a). \mid a \in A, m(a) = \hat a \\}$
-* $\pi_{m(F)}$ (found in `to-clustered-af.lp`) to deduce $\textbf{abs\\_arg}/1$, $\textbf{singleton}/1$ and $\textbf{abs\\_att}/2$.
+* $\pi_{m(F)}$ to deduce $\textbf{abs\\_arg}/1$, $\textbf{singleton}/1$ and $\textbf{abs\\_att}/2$.
 * $\pi_{\sigma}$ to deduce $\textbf{in}/1$
 * $\pi_{\hat \sigma}$ to deduce $\textbf{abs\\_in}/1$
 
@@ -204,12 +204,11 @@ The above procedure can be extended to achieve this by looping though the cluste
 
 This was implemented as a python program using `clingo` as answer set solver.
 The code can be found in `find_spurious.py`.
-Note that the procedure requres two nested calls to the `clingo` solver. 
+Note that the procedure requires two nested calls to the `clingo` solver. 
 The outer call is for computing the clustered extensions, 
 the inner call to check whether that extension is spurious or not.
 
-Note that besides $\pi_{\hat E}$, the inner ASP encoding is invariant  
-during the loop iteration.
+Note that besides $\pi_{\hat E}$, the inner ASP encoding is invariant during the loop iteration.
 Thus, we utilize clingo's Solving under Assumptions feature:
 The inner clingo program is grounded only once, before entering the loop.
 Then, during the loop, $\hat E$ is passed to the solver in the form of assumptions.
@@ -229,6 +228,13 @@ with the exception of some arguments for wich we would like to prove credulous /
 Those are mapped to singleton clusters (i.e. to themselves).
 
 TODO: Simonshaven example
+
+
+For example, in the simonshaven example, we may be interested in the acceptance of the argument $a$ only,
+so our coarsest mapping with $a$ singleton would look like this:
+$m(a) = a$, $m(b)=m(c)=m(d)=m(e)=m(f)=m(f')=m(g)=m(h)=m(i)=m(j)=m(k)=m(l)=m(aux1) = m(aux2) = \hat x$
+Or, as a partition:
+$\\{ \\{a\\}, \\{b,c,d,e,f,f',g,h,i,j,k,l,aux1,aux2\\} \\}$
 
 Once the coarse mapping is established, we try to find spurious clustered extensions similar to above. 
 If none exist, the abstraction is faithful and we are done.
@@ -286,7 +292,7 @@ In the following we refer to it as $\pi_{m(X) \sim \hat X}$.
 Additionally recall the ASP encodings defined above:
 * $\pi_F = \\{ \textbf{arg} (a). \mid a \in A \\} \cup \\{ \textbf{att} (a,b). \mid (a,b) \in R \\}$.
 * $\pi_m = \\{ \textbf{abs\\_map} (a, \hat a). \mid a \in A, m(a) = \hat a \\}$
-* $\pi_{m(F)}$ (found in `to-clustered-af.lp`) to deduce $\textbf{abs\\_arg}/1$, $\textbf{singleton}/1$ and $\textbf{abs\\_att}/2$.
+* $\pi_{m(F)}$ to deduce $\textbf{abs\\_arg}/1$, $\textbf{singleton}/1$ and $\textbf{abs\\_att}/2$.
 * $\pi_{\sigma}$ to deduce $\textbf{in}/1$
 * $\pi_{\hat \sigma}$ to deduce $\textbf{abs\\_in}/1$
 * $\pi_{\hat E} = \\{ \textbf{abs\\_in}(\hat a) \mid \hat a \in \hat E \\} \cup \\{ \textbf{-abs\\_in}(\hat a) \mid \hat a \in \hat A \setminus \hat E  \\}$
@@ -323,6 +329,25 @@ Observation:
 ## Exhaustive search for smallest abstraction
 
 ## Benchmarks
+
+We test the following examples
+* Fig1c: Figure 1c [^1] with admissible semantics
+* Fig3: Figure 3 [^1] with everything mapped to one and the same cluster, stable semantics
+* Simonshaven: The simonshaven example from above with $a$ singleton, everything else mapped to one and the same cluster. Admissible and stable semantics.
+
+We test the following procedures
+* Spurious-guided: 
+* Exhaustive
+
+| Example                     | Method          | Time     | Size | Partition                                                   |
+| Fig1c, $\sigma = adm$       | Spurious-guided | $<1s$    | 5    | `{a}, {b}, {c}, {d}, {e}`                                   |
+| Fig1c, $\sigma = adm$       | Exhaustive      | $<1s$    | 3    | `{a,b,c}, {d}, {e}` ( = Figure 1a)                          |
+| Fig3, $\sigma = stb$        | Spurious-guided | NA       | NA   | NA                                                          |
+| Fig3, $\sigma = stb$        | Exhaustive      | $27s$    | 5    | `{a,b,g,h}, {c}, {d}, {e}, {f}` ( = Figure 3b)              |
+| Simonshaven, $\sigma = adm$ | Spurious-guided | $1s$     | 9    | `{a}, {aux1}, {aux2}, {b}, {c}, {d}, {e,f,f',g,h,i,k}, {j}` |
+| Simonshaven, $\sigma = adm$ | Exhaustive      | $6s$     | 3    | `{a}, {aux1,c,d,e,f,f',g,j,k}, {aux2,b,h,i,l}`              |
+| Simonshaven, $\sigma = stb$ | Spurious-guided | $<1s$    | 15   | `{a}, {aux1}, {aux2}, {b}, {c}, {d}, {e}, {f}, {f'}, {g},`  |
+| Simonshaven, $\sigma = stb$ | Exhaustive      | $14m16s$ | 4    | `{a}, {aux1,aux2,b,c,d,e,f,f',i,j,k,l}, {g}, {h}`           |
 
 ## Future work
 
