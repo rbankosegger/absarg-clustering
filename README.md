@@ -96,7 +96,7 @@ In the text we refer to it also as $\pi_{m(F)}$.
 The classical semantics are defined as usual[^2],
 where $\textbf{in} (a)$ is true in some answer set iff $a \in S$ 
 for the extension $S$ that corresponds to that answer set.
-The clustered semantics are defined below, were $\textbf{abs\\_in} (a)$ is true in some answer set iff 
+The clustered semantics are defined below, were $\textbf{abs\\_in} (\hat a)$ is true in some answer set iff 
 $\hat a \in \hat S$ for the clustered extension $\hat S$ that corresponds to that answer set.
 
 We will refer to the ASP encodings of the 
@@ -162,7 +162,7 @@ Recall the ASP encodings defined above:
 * $\pi_{\sigma}$ to deduce $\textbf{in}/1$
 * $\pi_{\hat \sigma}$ to deduce $\textbf{abs\\_in}/1$
 
-Consider the program 
+First consider the program 
 $\pi_F \cup \pi_m \cup \pi_{m(F)} \cup \pi_\sigma \cup \pi_{\hat \sigma}$.
 The answer sets of this combination yield the cross product of classical and clustered extensions
 $(X, \hat X) \in \sigma(F) \times \hat \sigma( \hat F)$.
@@ -181,7 +181,7 @@ $\pi_{\hat E} = \\{ \textbf{abs\\_in}(\hat a) \mid \hat a \in \hat E \\} \cup \\
 and add it to constrain the answer sets accordingly.
 The final procedure is:
 
-$\mathcal {AS} ( \pi_F \cup \pi_m \cup \pi_{m(F)} \cup \pi_\sigma \cup \pi_{\hat \sigma} \cup \pi_{m(X) = \hat X} \cup \pi_{\hat E} ) \cong \\{ X, \hat X \mid X \in \sigma(F) \land \hat X \in \hat \sigma(\hat F) \land m(X) = \hat X \land \hat X = \hat E \\}$
+$\mathcal {AS} ( \pi_F \cup \pi_m \cup \pi_{m(F)} \cup \pi_\sigma \cup \pi_{\hat \sigma} \cup \pi_{m(X) = \hat X} \cup \pi_{\hat E} ) \cong \\{ X, \hat X \in \sigma(F) \times \hat \sigma( \hat F) \mid m(X) = \hat X \land \hat X = \hat E \\}$
 
 If there are no answer sets, then no $X$ corresponding to $\hat E$ could be found, 
 i.e. $\hat E$ is spurious.
