@@ -10,7 +10,7 @@
 
 ## Preliminaries
 
-https://proceedings.kr.org/2021/52/
+
 
 ### Argumentation frameworks
 
@@ -90,7 +90,7 @@ The classical semantics are defined as usual in the ASPARIX framework,
 where $\textbf{in} (a)$ is true in some answer set iff $a \in S$ 
 for the extension $S$ that corresponds to that answer set.
 
-TODO: Reference!
+TODO: Reference![^1]
 
 We will refer to the encoding of the 
 classical (resp. clustered) semantics as $\pi_{\sigma}$ ( $\pi_{\hat \sigma}$).
@@ -99,7 +99,7 @@ classical (resp. clustered) semantics as $\pi_{\sigma}$ ( $\pi_{\hat \sigma}$).
 
 The ASP implementation of these semantics are described in the paper.
 
-TODO: Reference
+TODO: Reference[^1]
 
 For the Clustered Conflict-Free case we have:
 
@@ -221,14 +221,96 @@ If none exist, the abstraction is faithful and we are done.
 If a spurious clustered extension is found, we would like to refine the abstraction mapping such that
 this clustered extension can no longer occur.
 
+With $\pi_{m(X) = \hat X}$, we get no answer sets
+we need to relax the rules
+idea: find most similar classical extension, analyse differences
 
+	abs_false_positive(X') :- abs_in(X'), 0 = #count{ X: in(X), abs_map(X,X')}.
+	abs_false_negative(X') :- in(X), abs_map(X,X'), not abs_in(X').
+	:~ abs_false_negative(C). [1@2,C]
+	:~ abs_false_positive(C). [1@2,C]
+	
+refinement candidates are false positive or false negative clusters.
+also, clusters that attack (are attacked by) singletons
+TODO: is it guaranteed that there is always a refinement candidate?
 
+	refinement_candidate(C) :- abs_false_positive(C).
+	refinement_candidate(C) :- abs_false_negative(C).
+	refinement_candidate(C) :- refinement_candidate(S), singleton(S), abs_att(C,S).
+	refinement_candidate(C) :- refinement_candidate(S), singleton(S), abs_att(S,C).
 
+Split refinement candidates in any possible way
 
+	abs_arg_size(C,S) :- abs_arg(C), S = #count{ A : abs_map(A, C) }.
+	1 = { abs_split(A, (C, 1..S)) } :- abs_map(A,C), refinement_candidate(C), not singleton(C), abs_arg_size(C,S).
+	
+Constrain splits that do not solve the problem
 
+	:- abs_split(A1, C), abs_split(A2, C), in(A1), not in(A2).
+	:- abs_split(A1, C), abs_split(A2, C), att(A1, S), not att(A2, S), refinement_candidate(S).
+	:- abs_split(A1, C), abs_split(A2, C), att(S, A1), not att(S, A2), singleton(S), refinement_candidate(S).
 
-## Exhaustive search for smalles abstraction
+Find an answer set with the minimal total number of splits
+
+	splits(C,M) :- M=#count { N : abs_split(_, (C,N)) }, refinement_candidate(C), not singleton(C).
+	:~ abs_split(A, (C,N)). [1@1,C,N
+	
+Above constrain do not guarantee a split for every case! There are counterexamples.
+TODO: Counterexamples
+Solve this by forcing at least one split (this is the lazy way!)
+
+	:- splits(_, M), M<=1.
+
+Build new mapping based on splits
+
+	abs_map_refined(A,(C,I)) :- abs_split(A,(C,I)).
+	abs_map_refined(A,C) :- abs_map(A,C), not abs_split(A,(C,_)).
+	
+All the above code is found in `spurious-guided-refinement.lp`. 
+In the following we refer to it as $\pi_{m(X) \sim \hat X}$.
+
+Additionally recall the ASP encodings defined above:
+* $\pi_F = \\{ \textbf{arg} (a). \mid a \in A \\} \cup \\{ \textbf{att} (a,b). \mid (a,b) \in R \\}$.
+* $\pi_m = \\{ \textbf{abs\\_map} (a, \hat a). \mid a \in A, m(a) = \hat a \\}$
+* $\pi_{m(F)}$ (found in `to-clustered-af.lp`) to deduce $\textbf{abs\\_arg}/1$, $\textbf{singleton}/1$ and $\textbf{abs\\_att}/2$.
+* $\pi_{\sigma}$ to deduce $\textbf{in}/1$
+* $\pi_{\hat \sigma}$ to deduce $\textbf{abs\\_in}/1$
+* $\pi_{\hat E} = \\{ \textbf{abs\\_in}(\hat a) \mid \hat a \in \hat E \\} \cup \\{ \textbf{-abs\\_in}(\hat a) \mid \hat a \in \hat A \setminus \hat E  \\}$
+
+With this we construct the following procedure:
+
+	initialize m
+	needs refinement = false
+	while True:
+		for ext in clustered extensions
+			cost, optmodel = $\pi_F \cup \pi_m \cup \pi_{m(F)} \cup \pi_\sigma \cup \pi_{\hat \sigma} \cup \pi_{m(X) \sim \hat X} \cup \pi_{\hat E}$
+			TODO: find out how to formalize finding the optimal model (and cost) 
+			
+			if cost > 0:
+				m = refined mapping from optmodel
+				needs refinement = true
+				break
+				
+		if not needs refinement
+			break
+
+> $m \leftarrow \text{A coarse initial mapping}$
+> for $\hat E \in \mathcal {AS} ( \pi_F \cup \pi_m \cup \pi_{m(F)} \cup \pi_{\hat \sigma} )$:
+>> $Q \leftarrow \mathcal {AS} ( \pi_F \cup \pi_m \cup \pi_{m(F)} \cup \pi_\sigma \cup \pi_{\hat \sigma} \cup \pi_{m(X) = \hat X} \cup \pi_{\hat E} )$
+>>
+>> if $Q = \emptyset$ return "spurious!"
+>>
+> return "not spurious!"
+
+Observation:
+	The procedure does not work for examples without an extension
+	this is because there is no optmodel, no way to guide the refinement
+
+## Exhaustive search for smallest abstraction
 
 ## Benchmarks
 
 ## Future work
+
+## References
+[^1]: Saribatur, Z. G., & Wallner, J. P. (2021, September). Existential Abstraction on Argumentation Frameworks via Clustering. In Proceedings of the International Conference on Principles of Knowledge Representation and Reasoning (Vol. 18, No. 1, pp. 549-559). https://proceedings.kr.org/2021/52/
