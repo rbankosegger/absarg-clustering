@@ -56,7 +56,7 @@ We define conflict-free, admissible and stable extensions for the clustered AF
 
 TODO: Fix stable semantics above!
 
-Finally, for some $F$, mapping $m$  and classical (resp. clustered) semantics $\sigma(F)$ ( $\hat \sigma (m(F))$ ), 
+Finally, for some $F$, mapping $m$, classical semantics $\sigma(F)$ and clustered semantics $\hat \sigma (m(F))$, 
 we say that:
 * $\hat E \in \hat \sigma (m(F))$ is spurious w.r.t. $F$ under $\sigma$ if $\not \exists E \in \sigma (F) : m(E) = \hat E$
 * $m(F)$ under $\hat \sigma$ is faithful w.r.t. $F$ under $\sigma$ if there is no spurious $\hat E \in \hat \sigma ( \hat m(F) )$ w.r.t $F$ under $\sigma$.
@@ -71,7 +71,7 @@ We use several examples from Saribatur and Wallner 2021[^1].
 * Figure 3 in the paper can be found as `examples/e3...` in the code. The meaning of the different `.lp` files are explained below.
 ![Figure 3, Saribatur and Wallner 2021](examples/e3.png)
 
-* The Simonshaven case from Prakken 2019[^3] serves as a practical application of the abstraction techniques. It was convereted into a classical-Af format by Saribatur and Wallner in their lecture notes (no public reference).
+* The Simonshaven case from Prakken 2019[^3] serves as a practical application of the abstraction techniques. It was convreted into a classical-AF format by Saribatur and Wallner in their lecture notes (no public reference).
 ![Simonshaven, Prakken 2019](examples/simonshaven.png)
 
 
@@ -150,10 +150,10 @@ To run the tests, execute in a terminal:
 
 ## Identifying spurious clustered extensions
 
-Given some $F$, $m$, $\hat F = m(F), \sigma$ and $\hat E \in \hat \sigma (\hat F)$.
-How can we know whether the extension $\hat E$ is spurious?
-We need to find an $E \in \sigma(F)$ such that $m(E) = \hat E$ if no such $E$ can be found, 
-we know that $\hat E$ is spurious..
+Given some $F$, $m$, $\hat F = m(F), \sigma$ and $\hat E \in \hat \sigma (\hat F)$,
+how can we know whether the extension $\hat E$ is spurious?
+We need to find an $E \in \sigma(F)$ such that $m(E) = \hat E$. 
+If no such $E$ can be found, we know that $\hat E$ is spurious.
 
 Recall the ASP encodings defined above:
 * $\pi_F = \\{ \textbf{arg} (a). \mid a \in A \\} \cup \\{ \textbf{att} (a,b). \mid (a,b) \in R \\}$.
@@ -177,7 +177,7 @@ Let's refer to these two constraints as $\pi_{m(X) = \hat X}$.
 
 Finally, we need to constrain the search to clustered extensions that map to $\hat E$.
 Let's encode $\hat E$ as the answer set program 
-$\pi_{\hat E} = \\{ \textbf{abs\\_in}(\hat a) \mid \hat a \in \hat E \\} \cup \\{ \textbf{-abs\\_in}(\hat a) \mid \hat a \in \hat A \setminus \hat E  \\}$
+$\pi_{\hat E} = \\{ \textbf{abs\\_in}(\hat a). \mid \hat a \in \hat E \\} \cup \\{ \textbf{-abs\\_in}(\hat a). \mid \hat a \in \hat A \setminus \hat E  \\}$
 and add it to constrain the answer sets accordingly.
 The final procedure is:
 
@@ -295,13 +295,13 @@ Additionally recall the ASP encodings defined above:
 * $\pi_{m(F)}$ to deduce $\textbf{abs\\_arg}/1$, $\textbf{singleton}/1$ and $\textbf{abs\\_att}/2$.
 * $\pi_{\sigma}$ to deduce $\textbf{in}/1$
 * $\pi_{\hat \sigma}$ to deduce $\textbf{abs\\_in}/1$
-* $\pi_{\hat E} = \\{ \textbf{abs\\_in}(\hat a) \mid \hat a \in \hat E \\} \cup \\{ \textbf{-abs\\_in}(\hat a) \mid \hat a \in \hat A \setminus \hat E  \\}$
+* $\pi_{\hat E} = \\{ \textbf{abs\\_in}(\hat a). \mid \hat a \in \hat E \\} \cup \\{ \textbf{-abs\\_in}(\hat a). \mid \hat a \in \hat A \setminus \hat E  \\}$
 
 With this we construct the following procedure:
 
 	initialize m
-	needs refinement = false
 	while True:
+		needs refinement = false
 		for ext in clustered extensions
 			cost, optmodel = $\pi_F \cup \pi_m \cup \pi_{m(F)} \cup \pi_\sigma \cup \pi_{\hat \sigma} \cup \pi_{m(X) \sim \hat X} \cup \pi_{\hat E}$
 			TODO: find out how to formalize finding the optimal model (and cost) 
@@ -314,13 +314,25 @@ With this we construct the following procedure:
 		if not needs refinement
 			break
 
-> $m \leftarrow \text{A coarse initial mapping}$
-> for $\hat E \in \mathcal {AS} ( \pi_F \cup \pi_m \cup \pi_{m(F)} \cup \pi_{\hat \sigma} )$:
->> $Q \leftarrow \mathcal {AS} ( \pi_F \cup \pi_m \cup \pi_{m(F)} \cup \pi_\sigma \cup \pi_{\hat \sigma} \cup \pi_{m(X) = \hat X} \cup \pi_{\hat E} )$
+> $m \leftarrow \text{(coarse) initial mapping}$
+>
+> while $\textbf{True}$
+>> $refine \leftarrow \textbf{False}$
 >>
->> if $Q = \emptyset$ return "spurious!"
->>
-> return "not spurious!"
+>> for $\hat E \in \mathcal {AS} ( \pi_F \cup \pi_m \cup \pi_{m(F)} \cup \pi_{\hat \sigma} )$:
+>>> $I \leftarrow an optimal answer set from \mathcal {AS} ( \pi_F \cup \pi_m \cup \pi_{m(F)} \cup \pi_\sigma \cup \pi_{\hat \sigma} \cup \pi_{m(X) = \hat X} \cup \pi_{\hat E} )$
+>>>
+>>> if $cost(I) > 0$:
+>>>> $m \leftarrow$ extract refined mapping from $\textbf{abs\\_map\\_refined}/2$ predicates in $I$
+>>>>
+>>>> $refine \leftarrow \textbf{True}$
+>>>>
+>>>> break 
+>>>
+>>> if $refine = \textbf{False}$:
+>>>		break
+>
+> return $m$
 
 Observation:
 	The procedure does not work for examples without an extension
@@ -339,16 +351,16 @@ We test the following procedures
 * Spurious-guided: 
 * Exhaustive
 
-| Example                     | Method          | Time     | Size | Partition                                                   |
-| --------------------------- | --------------- | -------- | ---- | ----------------------------------------------------------- |
-| Fig1c, $\sigma = adm$       | Spurious-guided | $<1s$    | 5    | `{a}, {b}, {c}, {d}, {e}`                                   |
-| Fig1c, $\sigma = adm$       | Exhaustive      | $<1s$    | 3    | `{a,b,c}, {d}, {e}` ( = Figure 1a)                          |
-| Fig3, $\sigma = stb$        | Spurious-guided | NA       | NA   | NA                                                          |
-| Fig3, $\sigma = stb$        | Exhaustive      | $27s$    | 5    | `{a,b,g,h}, {c}, {d}, {e}, {f}` ( = Figure 3b)              |
-| Simonshaven, $\sigma = adm$ | Spurious-guided | $1s$     | 9    | `{a}, {aux1}, {aux2}, {b}, {c}, {d}, {e,f,f',g,h,i,k}, {j}` |
-| Simonshaven, $\sigma = adm$ | Exhaustive      | $6s$     | 3    | `{a}, {aux1,c,d,e,f,f',g,j,k}, {aux2,b,h,i,l}`              |
-| Simonshaven, $\sigma = stb$ | Spurious-guided | $<1s$    | 15   | `{a}, {aux1}, {aux2}, {b}, {c}, {d}, {e}, {f}, {f'}, {g},`  |
-| Simonshaven, $\sigma = stb$ | Exhaustive      | $14m16s$ | 4    | `{a}, {aux1,aux2,b,c,d,e,f,f',i,j,k,l}, {g}, {h}`           |
+| Example                     | Method          | Time     | Best size | Best partition                                              |
+| --------------------------- | --------------- | -------- | ----      | ----------------------------------------------------------- |
+| Fig1c, $\sigma = adm$       | Spurious-guided | $<1s$    | 5         | `{a}, {b}, {c}, {d}, {e}`                                   |
+| Fig1c, $\sigma = adm$       | Exhaustive      | $<1s$    | 3         | `{a,b,c}, {d}, {e}` ( = Figure 1b)                          |
+| Fig3, $\sigma = stb$        | Spurious-guided | NA       | NA        | NA                                                          |
+| Fig3, $\sigma = stb$        | Exhaustive      | $27s$    | 5         | `{a,b,g,h}, {c}, {d}, {e}, {f}` ( = Figure 3b)              |
+| Simonshaven, $\sigma = adm$ | Spurious-guided | $1s$     | 9         | `{a}, {aux1}, {aux2}, {b}, {c}, {d}, {e,f,f',g,h,i,k}, {j}` |
+| Simonshaven, $\sigma = adm$ | Exhaustive      | $6s$     | 3         | `{a}, {aux1,c,d,e,f,f',g,j,k}, {aux2,b,h,i,l}`              |
+| Simonshaven, $\sigma = stb$ | Spurious-guided | $<1s$    | 15        | `{a}, {aux1}, {aux2}, {b}, {c}, {d}, {e}, {f}, {f'}, {g},`  |
+| Simonshaven, $\sigma = stb$ | Exhaustive      | $14m16s$ | 4         | `{a}, {aux1,aux2,b,c,d,e,f,f',i,j,k,l}, {g}, {h}`           |
 
 ## Future work
 
