@@ -256,7 +256,7 @@ To see examples of this, investigate and run `3-find-spurious.sh`
 
 ## Finding a minimal nonspurious partition
 
-Given some $F$, $\sigma$ and $\hat \sigma$ we would like to find a nonspurious abstraction mapping $m$ and clustered AF$\hat F = m(F)$
+Given some $F$, $\sigma$ and $\hat \sigma$ we would like to find a nonspurious abstraction mapping $m$ and clustered AF $\hat F = m(F)$
 that have some explanative value to the user.
 As such, $\hat F$ should be as simple as possible while preserving the attributes that should be "explained".
 For example, if one is interested in the credulous (or sceptical) acceptance of some argument in $F$, that argument must be singleton in $\hat F$,
@@ -349,7 +349,7 @@ As a counterexample consider $F=(\\{a,b,c,d,e,a_1,b_1,c_1,d_1,e_1\\}, \\{(a,b),(
 with the abstraction mapping $m(a)=a$, $m(a_1)=a_1$, $m(d)=d$, $m(d_1)=d_1$ and $m(b)=m(b_1)=m(c)=m(c_1)=m(e)=m(e_1)=\hat x$.
 This can be found in `tests/refinement-test3...`.
 Under admissible semantics, 
-the procedure yields $\\{ d, a_1 }\\$ as spurious clustered extension and finds $\\{ a, d, a_1 \\}$ as closest classical extension.
+the procedure yields $\\{ d, a_1 \\}$ as spurious clustered extension and finds $\\{ a, d, a_1 \\}$ as closest classical extension.
 $\hat x$ is correctly identified as a candidate for refinement, but ...
 But the above constraints 
 TODO: Run this counterexample, analyze in detail!
