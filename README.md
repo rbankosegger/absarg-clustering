@@ -410,7 +410,7 @@ run and investigate `4-refine-spurious-guided.sh` as well as
 ### Exhaustive search for the smallest abstraction
 
 It was hard to assess the performance of the previous procedure without some baseline.
-Thus, the next step in the project was to consider exhaustive search techniques that guarantee optimality.
+Thus, the next step in the project was to consider an exhaustive search technique that guarantees optimality and yields ideal results for comparison.
 
 As before, we start with an initial mapping $m_0$ and its ASP encoding $\pi_{m_0}$.
 The search space is spanned using a choice rule and the standard congruence axioms.
@@ -445,7 +445,7 @@ We can use the following procedure to find the provably optimal mapping
 >> if no $I$ was found:
 >>> break
 >>
->> $m \leftarrow $ extract the current mapping from $I$
+>> $m \leftarrow$ extract the current mapping from $I$
 >>
 >> spurious $\leftarrow$ check whether $m$ is spurious based on previously described procedures
 >> 
