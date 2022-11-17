@@ -112,7 +112,7 @@ def check_spuriousness_and_refine(semantics, mapping, clustered_extension):
         optimal_model = m
 
     if optimal_model == None:
-        print('Error! No ground stable models found! Exiting...')
+        print('Error! No ground extensions found! Exiting...')
         exit()
         
     symbols = optimal_model.symbols(shown=True)
