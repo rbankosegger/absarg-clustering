@@ -8,6 +8,45 @@
 * We implement methods to automatically compute non-spurious partitions
 * All implementations are done in Answer Set Programming (ASP) and Python 3
 
+## Installation & Useage
+
+The below code was developed in Python 3.10.8 and Clingo 5.5.1 . 
+Please consult to the installation documents for setup:
+* Python 3  https://www.python.org/downloads/
+* Clingo CLI & Python library https://potassco.org/clingo/
+
+Below is an overview of the features provided in this repository and how to use them.
+This is meant as a quick reference. Everything is explained in more detail below.
+
+Computing classical extensions
+
+	clingo <example>.lp <semantic>.lp 0
+	
+Computing clustered extensions
+
+	clingo <example>.lp <example-map>.lp to-clustered-af.lp <clustered-semantic>.lp
+	
+Checking whether an extension is spurious
+
+	clingo <example>.lp <example-map>.lp <example-clustered-extension>.lp to-clustered-af.lp <classical-semantics>.lp <clustered-semantic>.lp spurious.lp 0
+	
+Finding spurious extensions for an abstraction mapping
+
+	python find_spurious.py cf|admissible|stable <example>.lp <example-mapping>.lp
+	
+Abstraction refinement based on spurious clustered extensions
+	
+	python refine-spurious-guided.py cf|admissible|stable <example>.lp <example-mapping-initial>.lp
+	
+Abstraction refinement based on exhaustive search
+
+	python refine-exhaustive.py cf|admissible|stable <example>.lp <example-mapping-initial>.lp
+	
+... to see all options
+
+	python refine-exhaustive.py -h
+
+
 ## Preliminaries
 
 In this chapter we recite the central definitions from [^1].
@@ -17,9 +56,8 @@ In this chapter we recite the central definitions from [^1].
 Given a finite set of arguments $A$ and
 an attack relation $R \subseteq A \times A$ we define
 an argumentation framework (AF) as
-$F = (A,R)$
+$[F](F) = (A,R)$
 per usual [^1].
-
 
 We consider conflict-free, admissible and stable extensions
 (respectively $cf(F), adm(F), stb(F) \subseteq 2^A$)
@@ -216,72 +254,113 @@ This prevents unnecessary repetition of the grounding step and speeds up the pro
 
 To see examples of this, investigate and run `3-find-spurious.sh`
 
-## Spurious extension guided abstraction refinement
-Given some $F$, $\sigma$ and $\hat \sigma$ we would like to find a suitable
-abstraction mapping $m$.
-Suitability in our case refers to minimality w.r.t. the size of the induced partition $|\hat A|$.
+## Finding a minimal nonspurious partition
+
+Given some $F$, $\sigma$ and $\hat \sigma$ we would like to find a nonspurious abstraction mapping $m$ and clustered AF$\hat F = m(F)$
+that have some explanative value to the user.
+As such, $\hat F$ should be as simple as possible while preserving the attributes that should be "explained".
+For example, if one is interested in the credulous (or sceptical) acceptance of some argument in $F$, that argument must be singleton in $\hat F$,
+as explained in Saribatur and Wallner 2021[^1]
+
+For the purposes of this project, 
+we settle for finding nonspurious abstraction mappings that induce a partition with minimal size $|\hat A|$.
+
+All of the following procedures start with an initial abstraction mapping $m_0: A \mapsto \hat {A_0}$
+and search the space $\\{ m : A \mapsto \hat A \mid \forall x, y \in A : m_0 (x) \not = m_0 (y) \rightarrow m(x) \not = m(y) \\}$.
+Thus, if $x$ and $y$ are in different subsets of the partition according to $m_0$, they can never be "merged" into the same subset of the partition according to $m_0$.
+In particular, singletons $m_0 (x) = x$ are always singleton in the search space.
+On the other hand, if $x$ and $y$ are in the same subset of the partition according to $m_0$, it is possible that they get split into different subsets during the search.
+
+For example, in the simonshaven AF, we may be interested in the acceptance of the argument $a$.
+The initial mapping with $a$ singleton could look like this:
+$m_0(a) = a$ and $m_0(b)=m_0(c)=\ldots=m_0(l)=m_0(aux1)=m_0(aux2)=\hat x$ for all arguments other than $a$.
+The induced partition is:
+
+	{a}, {b,c,d,e,f,f',g,h,i,j,k,l,aux1,aux2}
+	
+The search might yield the following partitions. 
+All are nonspurious and whitness the sceptical but not credulous acceptance of $a$ w.r.t admissible semantics.
+The last one is optimal.
+
+	{a}, {aux1}, {aux2}, {b}, {c}, {d}, {e}, {f}, {f'}, {g}, {h}, {i}, {j}, {k}, {l}
+	{a}, {aux1}, {aux2}, {b}, {c}, {d}, {e}, {f}, {f'}, {g,h}, {i}, {j}, {k}, {l}
+	{a}, {aux1,aux2,f',g}, {b,f,h}, {c,d,e,k,l}, {i,j}
+	{a}, {aux1,aux2,c,d,f',g,i}, {b,e,f,h}, {j,k,l}
+	{a}, {aux1,c,d,e,f,f',g,j,k}, {aux2,b,h,i,l}
+
+### Local search guided by spurious abstraction mappings
 
 The first procedure is inspired by the counterexample-guided abstraction refinement (CEGAR) procedure which
 enjoys much success in the field of model checking.
-We start with a coarse mapping. Usually, this means mapping every argument to one and the same cluster,
-with the exception of some arguments for wich we would like to prove credulous / sceptical acceptance in the resulting clustered AF.
-Those are mapped to singleton clusters (i.e. to themselves).
 
-TODO: Simonshaven example
-
-
-For example, in the simonshaven example, we may be interested in the acceptance of the argument $a$ only,
-so our coarsest mapping with $a$ singleton would look like this:
-$m(a) = a$, $m(b)=m(c)=m(d)=m(e)=m(f)=m(f')=m(g)=m(h)=m(i)=m(j)=m(k)=m(l)=m(aux1) = m(aux2) = \hat x$
-Or, as a partition:
-$\\{ \\{a\\}, \\{b,c,d,e,f,f',g,h,i,j,k,l,aux1,aux2\\} \\}$
-
-Once the coarse mapping is established, we try to find spurious clustered extensions similar to above. 
+The procedure starts with $m_0$ and tries to find spurious clustered extensions as explained previously.
 If none exist, the abstraction is faithful and we are done.
-If a spurious clustered extension is found, we would like to refine the abstraction mapping such that
-this clustered extension can no longer occur.
+If a spurious clustered extension is found, we would like to split one or more subsets of 
+the current partition such that the spurious clustered extension can no longer occur.
+After refinement, the procedure is repeated.
 
-With $\pi_{m(X) = \hat X}$, we get no answer sets
-we need to relax the rules
-idea: find most similar classical extension, analyse differences
+But how can we derive information from the spurious clustered extension $\hat E$?
+The previously explained procedure with $\pi_{m(X) = \hat X}$ yields no answer sets in this case.
+However, while it is not possible to find an exact match $X \in \sigma(F)$ with $m(X) = \hat E$,
+one might be able to find another $X' \in \sigma(F)$ that is not an exact match but a close one.
+Then, one could analyse the difference between $X'$ and $\hat X$ in an attempt to explain why $\hat X$ is spurious,
+and to find a new mapping that incorporates the learned information.
+
+Finding the most similar $X' \in \sigma(F)$ was implemented using weak constraints.
+The following code assigns a cost of $1$ to every $x \in X'$ that cannot be mapped to some $\hat x \in \hat E$ 
+and vice versa. 
 
 	abs_false_positive(X') :- abs_in(X'), 0 = #count{ X: in(X), abs_map(X,X')}.
 	abs_false_negative(X') :- in(X), abs_map(X,X'), not abs_in(X').
 	:~ abs_false_negative(C). [1@2,C]
 	:~ abs_false_positive(C). [1@2,C]
 	
-refinement candidates are false positive or false negative clusters.
-also, clusters that attack (are attacked by) singletons
-TODO: is it guaranteed that there is always a refinement candidate?
+Note that if $\hat E$ is not spurious, an answer set corresponding to $X' \in \sigma(F)$ with $m(X') = \hat E$ will 
+be the optimal answer set with cost zero.
+
+The clustered arguments previously identified as false positives or false negatives are prime suspects for the
+occurence of $\hat E$ as spurious extension.
+They will be candidates for refinement, as well as clusters attacking or being attacked by false-positive (or false-negative) singletons.
 
 	refinement_candidate(C) :- abs_false_positive(C).
 	refinement_candidate(C) :- abs_false_negative(C).
 	refinement_candidate(C) :- refinement_candidate(S), singleton(S), abs_att(C,S).
 	refinement_candidate(C) :- refinement_candidate(S), singleton(S), abs_att(S,C).
 
-Split refinement candidates in any possible way
+To refine the candidates, we generate all possible ways of splitting them into subsets.  Given some clustered argument $\hat a$, we generate new clustered arguments $\hat a_1, \hat a_2, \ldots, \hat a_{|\hat a|}$ and consider all options of reassigning classical arguments originally mapped to $\hat a$ as answer sets.
 
 	abs_arg_size(C,S) :- abs_arg(C), S = #count{ A : abs_map(A, C) }.
 	1 = { abs_split(A, (C, 1..S)) } :- abs_map(A,C), refinement_candidate(C), not singleton(C), abs_arg_size(C,S).
 	
-Constrain splits that do not solve the problem
+We then constrain mappings based on the spurious extension and the found nearest classical extension.
 
 	:- abs_split(A1, C), abs_split(A2, C), in(A1), not in(A2).
 	:- abs_split(A1, C), abs_split(A2, C), att(A1, S), not att(A2, S), refinement_candidate(S).
 	:- abs_split(A1, C), abs_split(A2, C), att(S, A1), not att(S, A2), singleton(S), refinement_candidate(S).
 
-Find an answer set with the minimal total number of splits
+The goal is to perform as little splitting as possible while still respecting above constraints. 
+This preference is implemented as another weak constraint:
 
 	splits(C,M) :- M=#count { N : abs_split(_, (C,N)) }, refinement_candidate(C), not singleton(C).
-	:~ abs_split(A, (C,N)). [1@1,C,N
+	:~ abs_split(A, (C,N)). [1@1,C,N]
 	
-Above constrain do not guarantee a split for every case! There are counterexamples.
-TODO: Counterexamples
-Solve this by forcing at least one split (this is the lazy way!)
+Note that the constraints above do not guarantee that a split happens in every case.
+As a counterexample consider $F=(\\{a,b,c,d,e,a_1,b_1,c_1,d_1,e_1\\}, \\{(a,b),(a,c),(b,d),(a_1,b_1),(a_1,c_1),(b_1,d_1) \\})$
+with the abstraction mapping $m(a)=a$, $m(a_1)=a_1$, $m(d)=d$, $m(d_1)=d_1$ and $m(b)=m(b_1)=m(c)=m(c_1)=m(e)=m(e_1)=\hat x$.
+This can be found in `tests/refinement-test3...`.
+Under admissible semantics, 
+the procedure yields $\\{ d, a_1 }\\$ as spurious clustered extension and finds $\\{ a, d, a_1 \\}$ as closest classical extension.
+$\hat x$ is correctly identified as a candidate for refinement, but ...
+But the above constraints 
+TODO: Run this counterexample, analyze in detail!
+	
+To guarantee that at least one split happens during every refinement step,
+the following constraint can be added.
+So, if the above information does not help, we simply guess some split from the refinement candidates.
 
 	:- splits(_, M), M<=1.
 
-Build new mapping based on splits
+Finally, we define a new mapping based on the performed splits.
 
 	abs_map_refined(A,(C,I)) :- abs_split(A,(C,I)).
 	abs_map_refined(A,C) :- abs_map(A,C), not abs_split(A,(C,_)).
@@ -299,21 +378,6 @@ Additionally recall the ASP encodings defined above:
 
 With this we construct the following procedure:
 
-	initialize m
-	while True:
-		needs refinement = false
-		for ext in clustered extensions
-			cost, optmodel = $\pi_F \cup \pi_m \cup \pi_{m(F)} \cup \pi_\sigma \cup \pi_{\hat \sigma} \cup \pi_{m(X) \sim \hat X} \cup \pi_{\hat E}$
-			TODO: find out how to formalize finding the optimal model (and cost) 
-			
-			if cost > 0:
-				m = refined mapping from optmodel
-				needs refinement = true
-				break
-				
-		if not needs refinement
-			break
-
 > $m \leftarrow \text{coarse initial mapping}$
 >
 > while $\textbf{True}$:
@@ -330,15 +394,135 @@ With this we construct the following procedure:
 >>>> break 
 >>>
 >> if $refine = \textbf{False}$:
->>		break
+>>>		break
 >
 > return $m$
 
-Observation:
-	The procedure does not work for examples without an extension
-	this is because there is no optmodel, no way to guide the refinement
+Note that if the classical AF has no extensions under some semantics (e.g. Figure 3 in Saribatur and Wallner 2021[^1]),
+this procedure will fail. 
+This is because abstraction depends on finding similar classical extensions. 
+If there are none, then there are no answer sets and the refinement step is ill-defined.
+	
+To see examples of the procedure, 
+run and investigate `4-refine-spurious-guided.sh` as well as
+`4-refine-spurious-guided-tests.sh`.
 
-## Exhaustive search for smallest abstraction
+### Exhaustive search for the smallest abstraction
+
+It was hard to assess the performance of the previous procedure without some baseline.
+Thus, the next step in the project was to consider exhaustive search techniques that guarantee optimality.
+
+As before, we start with an initial mapping $m_0$ and its ASP encoding $\pi_{m_0}$.
+The search space is spanned using a choice rule and the standard congruence axioms.
+The following code returns all possible partitions that subsume the partition induced by $m_0$.
+
+	{ congruent(A,B) : abs_map(A,C), abs_map(B, C) }.
+	congruent(A,A) :- arg(A).
+	congruent(A,B) :- congruent(B,A).
+	congruent(A,C) :- congruent(A,B), congruent(B,C).
+	
+From the congruences, we can derive an abstraction mapping as follows:
+	
+	1 = { abs_split(A, (C,B)) : congruent(A, B) } :- abs_map(A,C).
+	:- abs_split(A, (X,B)), abs_map(A,X), congruent(A,C), C<B.
+	
+To optimize for the smallest partition, every split is associated with a cost of 1.
+	
+	:~ abs_split(_, (C,N)). [1,C,N]
+	
+We call above ASP encoding $\pi_{\text{Exhaustive}}$.
+
+
+We can use the following procedure to find the provably optimal mapping
+
+> $\pi \leftarrow \pi_{\text{Exhaustive}} \cup \pi_{m_0}$
+>
+> $\epsilon \leftarrow \infty$
+>
+> while $\textbf{True}$:
+>> $I \leftarrow$ an answer set from $\mathcal {AS} (\pi)$ with optimization cost $cost(I) < \epsilon - 1$
+>>
+>> if no $I$ was found:
+>>> break
+>>
+>> $m \leftarrow $ extract the current mapping from $I$
+>>
+>> spurious $\leftarrow$ check whether $m$ is spurious based on previously described procedures
+>> 
+>> if spurious:
+>>> Add a constraint to $\pi$ such that $m$ cannot occur again in the search
+>>
+>> else:
+>>> report $m$ as admisible mapping
+>>> $\epsilon \leftarrow cost(I)$
+
+In words, the procedure tries to find some admissible mapping strictly smaller than the current best admissible mapping.
+Already visited mappings will be marked as visited by adding them as constraints to the ASP search procedure.
+The procedure is done when ASP can no longer yield answer sets.
+Then, the current best admissible mapping is the optimal one.
+
+The procedure is implemented in `refine-exhaustive.py`.
+To see examples of this procedure,
+investigate and run `5-refine-exhaustive.sh`.
+
+Experimental variants of the procedure were implemented as well. 
+* By removing the cost restriction in line 4, it is possible to enumerate all nonspurious mappings, not just the ones that are better than the current best one.
+* In line 4, instead of simply finding some model of cost below the current best cost, we can enforce that the smallest unvisited mapping should always be considered next. Thus, a strict oder on enumerating mappings is enforced, from smallest to largest. This has no effect on the optimality of the procedure, but may affect performance significantly.
+
+To see examples of these modifications, investigate and run `5-refine-exhaustive-experimental.sh`.
+To see a full list of command line options, run `python refine-exhaustive.py -h`.
+			
+### Exhaustive search variant: Learning nogoods from spurious counterexamples
+
+Learn nogoods based on cegar-style procedure above
+instead of generating a new mapping, learn nogoods (what should not be congruent)
+
+	abs_false_positive(X') :- abs_in(X'), 0 = #count{ X: in(X), abs_map(X,X')}.
+	abs_false_negative(X') :- in(X), abs_map(X,X'), not abs_in(X').
+	
+	:~ abs_false_negative(C). [1@1,C]
+	:~ abs_false_positive(C). [1@1,C]
+	
+	refinement_candidate(C) :- abs_false_positive(C).
+	refinement_candidate(C) :- abs_false_negative(C).
+	refinement_candidate(C) :- refinement_candidate(S), singleton(S), abs_att(C,S).
+	refinement_candidate(C) :- refinement_candidate(S), singleton(S), abs_att(S,C).
+	
+	refine(A,C) :- refinement_candidate(C), abs_map(A,C).
+	
+	-congruent(A1, A2) :- refine(A1,C), refine(A2,C), in(A1), not in(A2).
+	-congruent(A1,A2) :- refine(A1,C), refine(A2,C), att(A1,S), not att(A2,S), refinement_candidate(S).
+	-congruent(A1,A2) :- refine(A1, C), refine(A2, C), att(S, A1), not att(S, A2), singleton(S), refinement_candidate(S).
+
+The procedure above can be modified 
+
+> $\pi \leftarrow \pi_{\text{Exhaustive}} \cup \pi_{m_0}$
+>
+> $\epsilon \leftarrow \infty$
+>
+> while $\textbf{True}$:
+>> $I \leftarrow$ an answer set from $\mathcal {AS} (\pi)$ with optimization cost $cost(I) < \epsilon - 1$
+>>
+>> if no $I$ was found:
+>>> break
+>>
+>> $m \leftarrow $ extract the current mapping from $I$
+>>
+>> spurious, noncongruents $\leftarrow$ check whether $m$ is spurious. If not, try to derive noncongruents based on the previously described procedure.
+>> 
+>> if spurious:
+>>> Add a constraint to $\pi$ such that $m$ cannot occur again in the search
+>>>
+>>> Add noncongruents as facts to $\pi$
+>>
+>> else:
+>>> report $m$ as admisible mapping
+>>> $\epsilon \leftarrow cost(I)$
+			
+This procedure reliably yields admissible abstraction mappings, but has no guarantee of finding the optimal one.
+For an example, consider its application to the Simonshaven example in `5-refine-exhaustive-experimental.sh` 
+and compare the result with those from
+`5-refine-exhaustive.sh`.
 
 ## Benchmarks
 
