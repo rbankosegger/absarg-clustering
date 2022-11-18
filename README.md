@@ -260,7 +260,7 @@ Given some $F$, $\sigma$ and $\hat \sigma$ we would like to find a nonspurious a
 that have some explanative value to the user.
 As such, $\hat F$ should be as simple as possible while preserving the attributes that should be "explained".
 For example, if one is interested in the credulous (or sceptical) acceptance of some argument in $F$, that argument must be singleton in $\hat F$,
-as explained in Saribatur and Wallner 2021[^1]
+as noted in Saribatur and Wallner 2021[^1]
 
 For the purposes of this project, 
 we settle for finding nonspurious abstraction mappings that induce a partition with minimal size $|\hat A|$.
@@ -271,7 +271,7 @@ Thus, if $x$ and $y$ are in different subsets of the partition according to $m_0
 In particular, singletons $m_0 (x) = x$ are always singleton in the search space.
 On the other hand, if $x$ and $y$ are in the same subset of the partition according to $m_0$, it is possible that they get split into different subsets during the search.
 
-For example, in the simonshaven AF, we may be interested in the acceptance of the argument $a$.
+For example, in the Simonshaven AF, we may be interested in the acceptance of the argument $a$.
 The initial mapping with $a$ singleton could look like this:
 $m_0(a) = a$ and $m_0(b)=m_0(c)=\ldots=m_0(l)=m_0(aux1)=m_0(aux2)=\hat x$ for all arguments other than $a$.
 The induced partition is:
@@ -288,7 +288,7 @@ The last one is optimal.
 	{a}, {aux1,aux2,c,d,f',g,i}, {b,e,f,h}, {j,k,l}
 	{a}, {aux1,c,d,e,f,f',g,j,k}, {aux2,b,h,i,l}
 
-### Local search guided by spurious abstraction mappings
+### Search guided by spurious abstraction mappings
 
 The first procedure is inspired by the counterexample-guided abstraction refinement (CEGAR) procedure which
 enjoys much success in the field of model checking.
@@ -344,19 +344,9 @@ This preference is implemented as another weak constraint:
 	splits(C,M) :- M=#count { N : abs_split(_, (C,N)) }, refinement_candidate(C), not singleton(C).
 	:~ abs_split(A, (C,N)). [1@1,C,N]
 	
-Note that the constraints above do not guarantee that a split happens in every case.
-As a counterexample consider $F=(\\{a,b,c,d,e,a_1,b_1,c_1,d_1,e_1\\}, \\{(a,b),(a,c),(b,d),(a_1,b_1),(a_1,c_1),(b_1,d_1) \\})$
-with the abstraction mapping $m(a)=a$, $m(a_1)=a_1$, $m(d)=d$, $m(d_1)=d_1$ and $m(b)=m(b_1)=m(c)=m(c_1)=m(e)=m(e_1)=\hat x$.
-This can be found in `tests/refinement-test3...`.
-Under admissible semantics, 
-the procedure yields $\\{ d, a_1 \\}$ as spurious clustered extension and finds $\\{ a, d, a_1 \\}$ as closest classical extension.
-$\hat x$ is correctly identified as a candidate for refinement, but ...
-But the above constraints 
-TODO: Run this counterexample, analyze in detail!
-	
-To guarantee that at least one split happens during every refinement step,
+To guarantee that at least one split happens for every refinement candidate,
 the following constraint can be added.
-So, if the above information does not help, we simply guess some split from the refinement candidates.
+So, if the above constraints do not help, we simply guess splits.
 
 	:- splits(_, M), M<=1.
 
@@ -430,18 +420,17 @@ From the congruences, we can derive an abstraction mapping as follows:
 To optimize for the smallest partition, every split is associated with a cost of 1.
 	
 	:~ abs_split(_, (C,N)). [1,C,N]
-	
-We call above ASP encoding $\pi_{\text{Exhaustive}}$.
 
-
-We can use the following procedure to find the provably optimal mapping
+The following procedure performs the exhaustive search.
+The ASP encoding above is referred to as 
+$\pi_{\text{Exhaustive}}$.
 
 > $\pi \leftarrow \pi_{\text{Exhaustive}} \cup \pi_{m_0}$
 >
 > $\epsilon \leftarrow \infty$
 >
 > while $\textbf{True}$:
->> $I \leftarrow$ an answer set from $\mathcal {AS} (\pi)$ with optimization cost $cost(I) < \epsilon - 1$
+>> $I \leftarrow$ an answer set from $\mathcal {AS} (\pi)$ with optimization cost $cost(I) \leq \epsilon - 1$
 >>
 >> if no $I$ was found:
 >>> break
@@ -455,6 +444,7 @@ We can use the following procedure to find the provably optimal mapping
 >>
 >> else:
 >>> report $m$ as admisible mapping
+>>>
 >>> $\epsilon \leftarrow cost(I)$
 
 In words, the procedure tries to find some admissible mapping strictly smaller than the current best admissible mapping.
@@ -475,8 +465,22 @@ To see a full list of command line options, run `python refine-exhaustive.py -h`
 			
 ### Exhaustive search variant: Learning nogoods from spurious counterexamples
 
-Learn nogoods based on cegar-style procedure above
-instead of generating a new mapping, learn nogoods (what should not be congruent)
+One of the problems of the search guided by spurious abstraction mappings is that there
+is little control over the order of occurences of counterexamples and how they affect the splitting process.
+This makes it hard to see whether splitting process works well or not at all.
+
+The exhaustive search technqiue works well, but searches the entire space of possible partitions, one by one.
+This does not scale to larter frameworks.
+
+In this next attempt, we try to use the exhaustive search procedure as a framework,
+but still try to learn from spurious counterexampes and try to add learned information
+as nogoods. Ideally, this lets us:
+* Check the quality of nogoods learned from counterexamples in an exhaustive search context.
+* Significantly reduce the number of partitions to check (due to the nogoods), making the procedure viable for larger AF's.
+
+Learning nogoods from spurious counterexamples works just as before.
+The only difference is that no splitting of refinement candidates is performed.
+Instead, "noncongruents" of the form $-\textbf{congruent}/2$ are derived. 
 
 	abs_false_positive(X') :- abs_in(X'), 0 = #count{ X: in(X), abs_map(X,X')}.
 	abs_false_negative(X') :- in(X), abs_map(X,X'), not abs_in(X').
@@ -494,20 +498,23 @@ instead of generating a new mapping, learn nogoods (what should not be congruent
 	-congruent(A1, A2) :- refine(A1,C), refine(A2,C), in(A1), not in(A2).
 	-congruent(A1,A2) :- refine(A1,C), refine(A2,C), att(A1,S), not att(A2,S), refinement_candidate(S).
 	-congruent(A1,A2) :- refine(A1, C), refine(A2, C), att(S, A1), not att(S, A2), singleton(S), refinement_candidate(S).
+	
+Above encoding can be found in `spurious-refinement-noncongruence.lp`
 
-The procedure above can be modified 
+These "noncongruents" can be added as facts to the ASP encoding that exhaustively generates new partitions,
+as indicated in the modified procedure below.
 
 > $\pi \leftarrow \pi_{\text{Exhaustive}} \cup \pi_{m_0}$
 >
 > $\epsilon \leftarrow \infty$
 >
 > while $\textbf{True}$:
->> $I \leftarrow$ an answer set from $\mathcal {AS} (\pi)$ with optimization cost $cost(I) < \epsilon - 1$
+>> $I \leftarrow$ an answer set from $\mathcal {AS} (\pi)$ with optimization cost $cost(I) \leq \epsilon - 1$
 >>
 >> if no $I$ was found:
 >>> break
 >>
->> $m \leftarrow $ extract the current mapping from $I$
+>> $m \leftarrow$ extract the current mapping from $I$
 >>
 >> spurious, noncongruents $\leftarrow$ check whether $m$ is spurious. If not, try to derive noncongruents based on the previously described procedure.
 >> 
@@ -518,14 +525,13 @@ The procedure above can be modified
 >>
 >> else:
 >>> report $m$ as admisible mapping
+>>>
 >>> $\epsilon \leftarrow cost(I)$
 			
-This procedure reliably yields admissible abstraction mappings, but has no guarantee of finding the optimal one.
-For an example, consider its application to the Simonshaven example in `5-refine-exhaustive-experimental.sh` 
-and compare the result with those from
-`5-refine-exhaustive.sh`.
+			
+For an example of this procedure, investigate and run `5-refine-exhaustive-experimental.sh`.
 
-## Benchmarks
+### Benchmarks
 
 We test the following examples
 * Fig1c: Figure 1c [^1] with admissible semantics
@@ -533,21 +539,44 @@ We test the following examples
 * Simonshaven: The simonshaven example from above with $a$ singleton, everything else mapped to one and the same cluster. Admissible and stable semantics.
 
 We test the following procedures
-* Spurious-guided: 
-* Exhaustive
+* Spurious-guided: Search guided by spurious abstraction mappings
+* Exhaustive : Exhaustive search for the smallest abstraction
+* Hybrid: The exhaustive search variant that also tries to learn nogoods
 
-| Example                     | Method          | Time     | Best size | Best partition                                              |
-| --------------------------- | --------------- | -------- | ----      | ----------------------------------------------------------- |
-| Fig1c, $\sigma = adm$       | Spurious-guided | $<1s$    | 5         | `{a}, {b}, {c}, {d}, {e}`                                   |
-| Fig1c, $\sigma = adm$       | Exhaustive      | $<1s$    | 3         | `{a,b,c}, {d}, {e}` ( = Figure 1b)                          |
-| Fig3, $\sigma = stb$        | Spurious-guided | NA       | NA        | NA                                                          |
-| Fig3, $\sigma = stb$        | Exhaustive      | $27s$    | 5         | `{a,b,g,h}, {c}, {d}, {e}, {f}` ( = Figure 3b)              |
-| Simonshaven, $\sigma = adm$ | Spurious-guided | $1s$     | 9         | `{a}, {aux1}, {aux2}, {b}, {c}, {d}, {e,f,f',g,h,i,k}, {j}` |
-| Simonshaven, $\sigma = adm$ | Exhaustive      | $6s$     | 3         | `{a}, {aux1,c,d,e,f,f',g,j,k}, {aux2,b,h,i,l}`              |
-| Simonshaven, $\sigma = stb$ | Spurious-guided | $<1s$    | 15        | `{a}, {aux1}, {aux2}, {b}, {c}, {d}, {e}, {f}, {f'}, {g},`  |
-| Simonshaven, $\sigma = stb$ | Exhaustive      | $14m16s$ | 4         | `{a}, {aux1,aux2,b,c,d,e,f,f',i,j,k,l}, {g}, {h}`           |
+The following table shows all the run tests.
+For the raw results see `4-refine-spurious-guided.sh.out`, `5-refine-exhaustive.sh.out` and `5-refine-exhaustive-experimental.sh.out`. 
+Repeat the experiments for yourself by running `4-refine-spurious-guided.sh`, `5-refine-exhaustive.sh` and `5-refine-exhaustive-experimental.sh`.
 
-## Future work
+| Example                     | Method          | Time     | Best size | Best partition                                                               |
+| --------------------------- | --------------- | -------- | --------- | ---------------------------------------------------------------------------- |
+| Fig1c, $\sigma = adm$       | Spurious-guided | $<1s$    | 5         | `{a}, {b}, {c}, {d}, {e}`                                                    |
+| Fig1c, $\sigma = adm$       | Exhaustive      | $<1s$    | 3         | `{a,b,c}, {d}, {e}` ( = Figure 1b)                                           |
+| Fig3, $\sigma = stb$        | Spurious-guided | NA       | NA        | NA                                                                           |
+| Fig3, $\sigma = stb$        | Exhaustive      | $27s$    | 5         | `{a,b,g,h}, {c}, {d}, {e}, {f}` ( = Figure 3b)                               |
+| Simonshaven, $\sigma = adm$ | Spurious-guided | $1s$     | 9         | `{a}, {aux1}, {aux2}, {b}, {c}, {d}, {e,f,f',g,h,i,k}, {j}`                  |
+| Simonshaven, $\sigma = adm$ | Exhaustive      | $6s$     | 3         | `{a}, {aux1,c,d,e,f,f',g,j,k}, {aux2,b,h,i,l}`                               |
+| Simonshaven, $\sigma = adm$ | Hybrid          | $28s$    | 13        | `{a}, {aux1}, {aux2}, {b}, {c}, {d}, {e,i,k}, {f}, {f'}, {g}, {h}, {j}, {l}` |
+| Simonshaven, $\sigma = stb$ | Spurious-guided | $<1s$    | 15        | `{a}, {aux1}, {aux2}, {b}, {c}, {d}, {e}, {f}, {f'}, {g},`                   |
+| Simonshaven, $\sigma = stb$ | Exhaustive      | $14m16s$ | 4         | `{a}, {aux1,aux2,b,c,d,e,f,f',i,j,k,l}, {g}, {h}`                            |
+
+The spurious-guided approach is very fust but in general does not yield desirable results.
+The exhaustive search yields good results in reasonable time, at least for the small examples considered here.
+The hybrid approach for the Simonshaven example under admissible semantics took longer than the exhaustive search
+and delivered a nondesirable result.
+
+### Conclusions and future work
+
+The search guided by spurious abstraction mappings worked in principle but did not deliver satisfactory abstractions.
+The first issue is that there is little control over which spurious clustered extensions and which clostest-matching classical extensions are chosen
+by clingo. This needs to be considered when aiming for any sort of optimality.
+Second, the theoretical properties of the procedure need to be considered more closely. 
+The procedure terminated for every tested input, but formal termination remains to be shown.
+The constraints involved in the splitting of refinement candidates need serious reconsideration.
+One open question here is whether different semantics would require different constraints.
+
+The exhaustive search technqiue worked well for the given examples but will not scale to large AFs.
+One possible way to solve the scaleability issue is to prune the space of abstraction mappings as shown in the hybrid methods.
+Also here, the method of generating nogoods needs to be reconsidered.
 
 [^1]: Saribatur, Z. G., & Wallner, J. P. (2021, September). Existential Abstraction on Argumentation Frameworks via Clustering. In Proceedings of the International Conference on Principles of Knowledge Representation and Reasoning (Vol. 18, No. 1, pp. 549-559). https://proceedings.kr.org/2021/52/
 [^2]: Dvořák, W., König, M., Rapberger, A., Wallner, J. P., & Woltran, S. (2021). ASPARTIX-V - A Solver for Argumentation Tasks Using ASP. https://www.dbai.tuwien.ac.at/research/argumentation/aspartix/papers/ASPOCP_2021.pdf
