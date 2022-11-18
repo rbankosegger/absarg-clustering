@@ -56,7 +56,7 @@ In this chapter we recite the central definitions from [^1].
 Given a finite set of arguments $A$ and
 an attack relation $R \subseteq A \times A$ we define
 an argumentation framework (AF) as
-$[F](F) = (A,R)$
+$F = (A,R)$
 per usual [^1].
 
 We consider conflict-free, admissible and stable extensions
