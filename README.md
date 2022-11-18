@@ -578,6 +578,10 @@ The exhaustive search technqiue worked well for the given examples but will not 
 One possible way to solve the scaleability issue is to prune the space of abstraction mappings as shown in the hybrid methods.
 Also here, the method of generating nogoods needs to be reconsidered.
 
+Also, the exhaustive search method may be improved in future work by optimizing not for the size of $\hat A$, but for the size of
+$\hat R$ instead. Depending on the situation, this tweak might lead to even simpler clustered frameworks.
+
+
 [^1]: Saribatur, Z. G., & Wallner, J. P. (2021, September). Existential Abstraction on Argumentation Frameworks via Clustering. In Proceedings of the International Conference on Principles of Knowledge Representation and Reasoning (Vol. 18, No. 1, pp. 549-559). https://proceedings.kr.org/2021/52/
 [^2]: Dvořák, W., König, M., Rapberger, A., Wallner, J. P., & Woltran, S. (2021). ASPARTIX-V - A Solver for Argumentation Tasks Using ASP. https://www.dbai.tuwien.ac.at/research/argumentation/aspartix/papers/ASPOCP_2021.pdf
 [^3]: Prakken, H. (2020). An argumentation‐based analysis of the Simonshaven case. Topics in cognitive science, 12(4), 1068-1091. https://onlinelibrary.wiley.com/doi/full/10.1111/tops.12418
