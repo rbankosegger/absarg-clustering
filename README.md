@@ -559,12 +559,12 @@ Repeat the experiments for yourself by running `4-refine-spurious-guided.sh`, `5
 | Simonshaven, $\sigma = stb$ | Spurious-guided | $<1s$    | 15        | `{a}, {aux1}, {aux2}, {b}, {c}, {d}, {e}, {f}, {f'}, {g},`                   |
 | Simonshaven, $\sigma = stb$ | Exhaustive      | $14m16s$ | 4         | `{a}, {aux1,aux2,b,c,d,e,f,f',i,j,k,l}, {g}, {h}`                            |
 
-The spurious-guided approach is very fust but in general does not yield desirable results.
+The spurious-guided approach is very fast but in general does not yield desirable results.
 The exhaustive search yields good results in reasonable time, at least for the small examples considered here.
 The hybrid approach for the Simonshaven example under admissible semantics took longer than the exhaustive search
 and delivered a nondesirable result.
 
-### Conclusions and future work
+### Conclusions
 
 The search guided by spurious abstraction mappings worked in principle but did not deliver satisfactory abstractions.
 The first issue is that there is little control over which spurious clustered extensions and which clostest-matching classical extensions are chosen
