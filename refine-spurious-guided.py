@@ -4,12 +4,13 @@ from clingo.symbol import parse_term
 import clingo
 import sys
 
-semantics = sys.argv[1]
-lp_concrete = sys.argv[2]
-lp_map_start = sys.argv[3]
 if '-h' in sys.argv or len(sys.argv)!=4:
     print('usage: python find_spurious.py cf|admissible|stable instance-concrete.lp instance-mapping.lp')
     quit()
+
+semantics = sys.argv[1]
+lp_concrete = sys.argv[2]
+lp_map_start = sys.argv[3]
 
 # Read out mapping
 ctl = Control()
@@ -51,39 +52,23 @@ def compute_clustered_extensions(semantics, mapping):
 
 def simplify_mapping(mapping):
 
-    #return mapping
-
     partition = dict()
     for k,v in mapping.items():
         if not v in partition.keys():
             partition[v] = list()
         partition[v].append(k)
 
-    #print(partition)
-
-    #mapping2=dict()
-    for k,v in mapping.items():
-        #mapping[k] = '"(' + ','.join(sorted(partition[v])) + ')"'
-        #mapping[k] = '(' + ','.join(sorted(partition[v])) + ')'
+    for k,v in mapping.copy().items():
         if len(partition[v]) > 1:
-            #mapping[k] = '(' + ','.join(sorted(partition[v])) + ')'
-            #mapping[k] = 'clu_' + '_'.join(sorted(partition[v]))
             mapping[k] = '(' + ','.join(sorted(partition[v])) + ')'
         else:
-            #mapping[k] = '"(' + ','.join(sorted(partition[v])) + ')"'
-            #mapping[k] = '(' + ','.join(sorted(partition[v])) + ')'
-            #mapping[k] = 'single_' + partition[v][0]
-
             mapping[k], = partition[v]
-            #pass
 
     partition = dict()
     for k,v in mapping.items():
         if not v in partition.keys():
             partition[v] = list()
         partition[v].append(k)
-
-    #print(partition)
 
     return mapping
 
@@ -92,7 +77,6 @@ def check_spuriousness_and_refine(semantics, mapping, clustered_extension):
 
     ctl = Control()
     ctl.configuration.solve.models = 0
-
     
     ctl.load(lp_concrete)
     ctl.add('base', [], '\n'.join(f'abs_map({k},{v}).' for k, v in mapping.items()))
@@ -125,6 +109,7 @@ def check_spuriousness_and_refine(semantics, mapping, clustered_extension):
         #print(optimal_model)
         print(f'\tSpurious: {str_clustered}')
         #print(f'\tBest match: {str_concrete}')
+        #print(symbols)
         mapping_refined = { str(lit.arguments[0]) : str(lit.arguments[1]) for lit in symbols if lit.match('abs_map_refined', 2) }
         mapping_refined = simplify_mapping(mapping_refined)
         #print(f'\t\t{mapping_refined}')
