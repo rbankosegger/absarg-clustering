@@ -145,7 +145,7 @@ The semantics-related encodings can be found in the folder `/semantics`.
 The extensions are computed as follows:
 
 * $\sigma (F) = \\{ \\{ a \mid \textbf{in}(a) \in I \\} \mid I \in \mathcal{AS}( \pi_F \cup \pi_{\sigma} ) \\}$
-* $\hat \sigma (m(F)) = \\{ \\{ \hat a \mid \textbf{abs\\_in} (\hat a) \in I \\} \mid I \in \mathcal{AS}(\pi_F \cup \pi_m \cup \pi_{m(F)} \cup \pi_{\hat \sigma}) \\}$
+* $\hat \sigma (m(F)) = \\{ \\{ \hat a \mid \texttt{abs\\_in} (\hat a) \in I \\} \mid I \in \mathcal{AS}(\pi_F \cup \pi_m \cup \pi_{m(F)} \cup \pi_{\hat \sigma}) \\}$
 
 
 ### Clustered Conflict-Free and Clustered Admissible Semantics
