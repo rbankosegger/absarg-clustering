@@ -146,8 +146,8 @@ The extensions are computed as follows:
 
 * $\sigma (F) \cong \mathcal{AS} ( \pi_F \cup \pi_{\sigma} )$
 * $\hat \sigma (m(F)) \cong \mathcal{AS} ( \pi_F \cup \pi_m \cup \pi_{m(F)} \cup \pi_{\hat \sigma} )$
-* $\sigma (F) = \\{ \\{a \mid \textbf{in}(a) \in I \\} \mid I \in \mathcal{AS}( \pi_F \cup \pi_{\sigma} )$
-* $\hat \sigma (m(F)) = \\{ \\{a \mid \textbf{abs\\_in}(\hat a) \in I \\} \mid I \in \mathcal{AS}( \pi_F \cup \pi_m \cup \pi_{m(F)} \cup \pi_{\hat \sigma} )$
+* $\sigma (F) = \\{ \\{a \mid \textbf{in}(a) \in I \\} \mid I \in \mathcal{AS}( \pi_F \cup \pi_{\sigma} ) \\}$
+* $\hat \sigma (m(F)) = \\{ \\{a \mid \textbf{abs\\_in}(\hat a) \in I \\} \mid I \in \mathcal{AS}( \pi_F \cup \pi_m \cup \pi_{m(F)} \cup \pi_{\hat \sigma} ) \\}$
 
 
 ### Clustered Conflict-Free and Clustered Admissible Semantics
