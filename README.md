@@ -107,7 +107,7 @@ We use several examples from Saribatur and Wallner 2021[^1].
 * Figure 3 in the paper can be found as `examples/e3...` in the code. The meaning of the different `.lp` files are explained below.
 ![Figure 3, Saribatur and Wallner 2021](examples/e3.png)
 
-* The Simonshaven case from Prakken 2019[^3] serves as a practical application of the abstraction techniques. It was convreted into a classical-AF format by Saribatur and Wallner in their lecture notes (no public reference).
+* The Simonshaven case from Prakken 2019[^3] serves as a practical application of the abstraction techniques. It was converted into a classical-AF format by Saribatur and Wallner in their lecture notes (no public reference).
 ![Simonshaven, Prakken 2019](examples/simonshaven.png)
 
 
@@ -145,7 +145,7 @@ The semantics-related encodings can be found in the folder `/semantics`.
 The extensions are computed as follows:
 
 * $\sigma (F) \cong \mathcal{AS} ( \pi_F \cup \pi_{\sigma} )$
-* $\sigma (m(F)) \cong \mathcal{AS} ( \pi_F \cup \pi_m \cup \pi_{m(F)} \cup \pi_{\hat \sigma} )$
+* $\hat \sigma (m(F)) \cong \mathcal{AS} ( \pi_F \cup \pi_m \cup \pi_{m(F)} \cup \pi_{\hat \sigma} )$
 
 
 ### Clustered Conflict-Free and Clustered Admissible Semantics
